@@ -19,13 +19,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 #if defined(DEBUG) | defined(_DEBUG)
       _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+
+	  //init the window
 	  D3DWindow app(hInstance);
 	  if ( !app.Init() )
 		  return 0;
 
-	  int a = 1;
-	  int ret = app.Run();
-	  return ret;
+	  return  app.Run();
 }
 
 
