@@ -401,10 +401,10 @@ void ShapesApp::init_fx()
 
 	// compilationMsgs can store errors or warnings.
 	if( compilationMsgs != 0 )
-		{
+	{
 		MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
 		ReleaseCOM(compilationMsgs);
-		}
+	}
 
 	// Even if there are no compilationMsgs, check to make sure there were no other errors.
 	if(FAILED(hr))
@@ -416,6 +416,7 @@ void ShapesApp::init_fx()
 		compiledShader->GetBufferSize(), 
 		0, pDevice, &pFX));
 	// Done with compiled shader.
+
 	ReleaseCOM(compiledShader);
 	pTech    = pFX->GetTechniqueByName("ColorTech");
 	pFxWorldViewProj = pFX->GetVariableByName("gWorldViewProj")->AsMatrix();
@@ -433,6 +434,6 @@ void ShapesApp::init_layout()
 	D3DX11_PASS_DESC passDesc;
 	pTech->GetPassByIndex(0)->GetDesc(&passDesc);
 	HR(pDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature, 
-		passDesc.IAInputSignatureSize, &pInputLayout));
+		                          passDesc.IAInputSignatureSize, &pInputLayout));
 
 }
