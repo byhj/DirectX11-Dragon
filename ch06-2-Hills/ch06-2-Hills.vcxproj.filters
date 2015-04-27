@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch6-1-Box.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="d3dUtil.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
@@ -28,6 +25,12 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="d3dApp.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ch06-2-Hills.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryGenerator.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -42,6 +45,9 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="d3dApp.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryGenerator.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>

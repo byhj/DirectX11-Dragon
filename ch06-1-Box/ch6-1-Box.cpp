@@ -85,10 +85,10 @@ BoxApp::BoxApp(HINSTANCE hInstance)
 
 BoxApp::~BoxApp()
 {
-   ReleaseCOM(pVB);
-   ReleaseCOM(pIB);
-   ReleaseCOM(pFX);
-   ReleaseCOM(pInputLayout);
+    ReleaseCOM(pVB);
+    ReleaseCOM(pIB);
+    ReleaseCOM(pFX);
+    ReleaseCOM(pInputLayout);
 }
 
 bool BoxApp::Init()
@@ -117,7 +117,7 @@ void BoxApp::UpdateScene(float dt)
 	 float z = Radius * sinf(Phi) * sinf(Theta);
 	 float y = Radius * cosf(Phi);
 
-	 //set the view  matrix
+	 //set the view matrix, we change camera pos when the mouse move
 	 XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
 	 XMVECTOR target = XMVectorZero();
 	 XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -142,7 +142,7 @@ void BoxApp::Render()
 	pDeviceContext->IASetIndexBuffer(pIB, DXGI_FORMAT_R32_UINT, 0);
     
 	// Set constants
-	XMMATRIX w = XMLoadFloat4x4(&world);
+	XMMATRIX w  = XMLoadFloat4x4(&world);
 	XMMATRIX v  = XMLoadFloat4x4(&view);
 	XMMATRIX p  = XMLoadFloat4x4(&proj);
 	XMMATRIX worldViewProj = w * v * p;
@@ -227,8 +227,9 @@ void BoxApp::init_buffer()
 	 D3D11_SUBRESOURCE_DATA vinitData;
 	 vinitData.pSysMem = VertexData;
 	 HR( pDevice->CreateBuffer(&vbDesc, &vinitData, &pVB) );
-	 // Create the index buffer
 
+
+	 // Create the index buffer
 	 UINT indices[] = 
 	{
 		 // front face

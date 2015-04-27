@@ -15,16 +15,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch6-1-Box.cpp">
+    <ClCompile Include="ch6-3-Shapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="d3dUtil.cpp">
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryGenerator.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="GameTimer.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="MathHelper.cpp">
+    <ClCompile Include="d3dUtil.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="d3dApp.cpp">
@@ -32,13 +35,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="d3dUtil.h">
+    <ClInclude Include="MathHelper.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryGenerator.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="GameTimer.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="MathHelper.h">
+    <ClInclude Include="d3dUtil.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="d3dApp.h">
