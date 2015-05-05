@@ -56,6 +56,7 @@ float HillsApp::GetHeight(float x, float z) const
 	return 0.3f*( z*sinf(0.1f*x) + x*cosf(0.1f*z) );
 }
 
+
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					_In_ LPWSTR lpCmdLine, _In_ int nShowCmd )
 {
@@ -74,9 +75,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 
 HillsApp::HillsApp(HINSTANCE hInstance)
-	:D3DApp(hInstance), pVB(0), pIB(0), pFX(0), pTech(0),
-	pInputLayout(0), pFxWorldViewProj(0), GridIndexCount(0),
-	Theta(1.5 * MathHelper::Pi), Phi(0.25f * MathHelper::Pi), Radius(200.0f)
+	:D3DApp(hInstance), 
+	pVB(0), 
+	pIB(0), 
+	pFX(0), 
+	pTech(0),
+	pInputLayout(0), 
+	pFxWorldViewProj(0),
+	GridIndexCount(0),
+	Theta(1.5 * MathHelper::Pi),
+	Phi(0.25f * MathHelper::Pi), 
+	Radius(200.0f)
 {
 	WindowTitle = L"Hills Demo";
 	LastMousePos.x = 0;
@@ -135,11 +144,11 @@ void HillsApp::UpdateScene(float dt)
 }
 
 void HillsApp::Render()
-	{
+{
 	assert(pDeviceContext);
 	assert(pSwapChain);
 
-	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Blue));
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
 	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 	pDeviceContext->IASetInputLayout(pInputLayout);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -163,7 +172,7 @@ void HillsApp::Render()
 		pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 		pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
 		pDeviceContext->DrawIndexed(GridIndexCount, 0, 0);
-	}
+}
 
 	HR(pSwapChain->Present(0, 0));
 }
@@ -195,7 +204,7 @@ void HillsApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 		//restrict the angle phi
 		Phi = MathHelper::Clamp(Phi, 0.1f, MathHelper::Pi-0.1f);
-	}
+}
 	else if ( (btnState * MK_RBUTTON) != 0)
 	{
 		float dx = 0.2f * static_cast<float>(x - LastMousePos.x);
@@ -203,7 +212,7 @@ void HillsApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 		Radius += dx - dy;
 		Radius = MathHelper::Clamp(Radius, 50.0f, 500.0f);
-	}
+}
 	LastMousePos.x = x;
 	LastMousePos.y = y;
 }
@@ -216,6 +225,8 @@ void HillsApp::init_buffer()
 	GridIndexCount = grid.Indices.size();
 
 	std::vector<Vertex> vertices(grid.Vertices.size());
+
+	//According Height, we use different color
 	for(size_t i = 0; i < grid.Vertices.size(); ++i)
 	{
 		XMFLOAT3 p = grid.Vertices[i].Position;
@@ -227,28 +238,28 @@ void HillsApp::init_buffer()
 		{
 			// Sandy beach color.
 			vertices[i].Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
-		}
+	}
 		else if( p.y < 5.0f )
 		{
 			// Light yellow-green.
 			vertices[i].Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		}
+	}
 		else if( p.y < 12.0f )
 		{
 			// Dark yellow-green.
 			vertices[i].Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
-		}
+	}
 		else if( p.y < 20.0f )
 		{
 			// Dark brown.
 			vertices[i].Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
-		}
+	}
 		else
 		{
 			// White snow.
 		    vertices[i].Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
 	}
+}
 
 	D3D11_BUFFER_DESC vbDesc;
 	vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -260,7 +271,6 @@ void HillsApp::init_buffer()
 	D3D11_SUBRESOURCE_DATA vinitData;
 	vinitData.pSysMem = &vertices[0];
 	HR( pDevice->CreateBuffer(&vbDesc, &vinitData, &pVB) );
-	// Create the index buffer
 
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -284,25 +294,24 @@ void HillsApp::init_fx()
 	ID3D10Blob* compiledShader = 0;
 	ID3D10Blob* compilationMsgs = 0;
 	HRESULT hr = D3DX11CompileFromFile(L"color.fx", 0, 0, 0, "fx_5_0", shaderFlags, 
-		0, 0, &compiledShader, &compilationMsgs, 0);
+		                               0, 0, &compiledShader, &compilationMsgs, 0);
 
 	// compilationMsgs can store errors or warnings.
 	if( compilationMsgs != 0 )
-		{
+	{
 		MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
 		ReleaseCOM(compilationMsgs);
-		}
+}
 
 	// Even if there are no compilationMsgs, check to make sure there were no other errors.
 	if(FAILED(hr))
 	{
 		DXTrace(__FILE__, (DWORD)__LINE__, hr, L"D3DX11CompileFromFile", true);
-	}
+}
 
 	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), 
-		compiledShader->GetBufferSize(), 
-		0, pDevice, &pFX));
-	// Done with compiled shader.
+		compiledShader->GetBufferSize(), 0, pDevice, &pFX));
+
 	ReleaseCOM(compiledShader);
 	pTech    = pFX->GetTechniqueByName("ColorTech");
 	pFxWorldViewProj = pFX->GetVariableByName("gWorldViewProj")->AsMatrix();
@@ -311,10 +320,10 @@ void HillsApp::init_fx()
 void HillsApp::init_layout()
 {	// Create the vertex input layout.
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-		{
+	{
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-		};
+};
 
 	// Create the input layout
 	D3DX11_PASS_DESC passDesc;

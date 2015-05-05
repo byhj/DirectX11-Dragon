@@ -3,13 +3,13 @@
 #include "MathHelper.h"
 
 struct Vertex
-	{
+{
 	XMFLOAT3 Pos;
 	XMFLOAT4 Color;
-	};
+};
 
 class SkullApp :public D3DApp
-	{
+{
 	public:
 		SkullApp(HINSTANCE hInstance);
 		~SkullApp();
@@ -47,11 +47,11 @@ class SkullApp :public D3DApp
 		UINT SkullIndexCount;
 		POINT LastMousePos;
 		ID3D11RasterizerState* pWireframeRS;
-	};
+};
 
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					_In_ LPWSTR lpCmdLine, _In_ int nShowCmd )
-	{
+{
 	// Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
@@ -63,14 +63,14 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		return 0;
 
 	return  app.Run();
-	}
+}
 
 
 SkullApp::SkullApp(HINSTANCE hInstance)
 	:D3DApp(hInstance), pVB(0), pIB(0), pFX(0), pTech(0),
 	pInputLayout(0), pFxWorldViewProj(0), pWireframeRS(0),
 	Theta(1.5 * MathHelper::Pi), Phi(0.25f * MathHelper::Pi), Radius(20.0f)
-	{
+{
 	WindowTitle = L"Box Demo";
 	LastMousePos.x = 0;
 	LastMousePos.y = 0;
@@ -80,16 +80,16 @@ SkullApp::SkullApp(HINSTANCE hInstance)
 	XMStoreFloat4x4(&view, I);
 	XMStoreFloat4x4(&proj, I);
 
-	}
+}
 
 
 SkullApp::~SkullApp()
-	{
+{
 	ReleaseCOM(pVB);
 	ReleaseCOM(pIB);
 	ReleaseCOM(pFX);
 	ReleaseCOM(pInputLayout);
-	}
+}
 
 bool SkullApp::Init()
 {
@@ -111,15 +111,15 @@ bool SkullApp::Init()
 }
 
 void SkullApp::Resize()
-	{
+{
 	D3DApp::Resize();
 
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 	XMStoreFloat4x4(&proj, P);
-	}
+}
 
 void SkullApp::UpdateScene(float dt)
-	{
+{
 	//convert spherical to cartesian coordinates
 	float x = Radius * sinf(Phi) * cosf(Theta);
 	float z = Radius * sinf(Phi) * sinf(Theta);
@@ -132,14 +132,14 @@ void SkullApp::UpdateScene(float dt)
 	XMMATRIX v = XMMatrixLookAtLH(pos, target, up);
 	XMStoreFloat4x4(&view, v);
 
-	}
+}
 
 void SkullApp::Render()
-	{
+{
 	assert(pDeviceContext);
 	assert(pSwapChain);
 
-	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Blue));
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
 	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 	pDeviceContext->IASetInputLayout(pInputLayout);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -161,33 +161,33 @@ void SkullApp::Render()
 	pTech->GetDesc( &techDesc );
 
 	for(UINT p = 0; p < techDesc.Passes; ++p)
-		{
+	{
 		pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
 
 		// 36 indices for the box.
 		pDeviceContext->DrawIndexed(SkullIndexCount, 0, 0);
-		}
+}
 
 	HR(pSwapChain->Present(0, 0));
-	}
+}
 
 
 void SkullApp::OnMouseDown(WPARAM btnState, int x, int y)
-	{
+{
 	LastMousePos.x = x;
 	LastMousePos.y = y;
 	SetCapture(hWnd);
-	}
+}
 
 void SkullApp::OnMouseUp(WPARAM btnState, int x, int y)
-	{
+{
 	ReleaseCapture();
-	}
+}
 
 void SkullApp::OnMouseMove(WPARAM btnState, int x, int y)
-	{
+{
 	if ( (btnState & MK_LBUTTON) != 0)
-		{
+	{
 		//make each pixel correspond to a quarter of a degree;
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - LastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - LastMousePos.y));
@@ -198,28 +198,28 @@ void SkullApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 		//restrict the angle phi
 		Phi = MathHelper::Clamp(Phi, 0.1f, MathHelper::Pi-0.1f);
-		}
+}
 	else if ( (btnState * MK_RBUTTON) != 0)
-		{
+	{
 		float dx = 0.005f * static_cast<float>(x - LastMousePos.x);
 		float dy = 0.005f * static_cast<float>(y - LastMousePos.y);
 
 		Radius += dx - dy;
 		Radius = MathHelper::Clamp(Radius, 5.0f, 50.0f);
-		}
+}
 	LastMousePos.x = x;
 	LastMousePos.y = y;
-	}
+}
 
 void SkullApp::init_buffer()
 {
-	std::ifstream fin("../common/media/car.txt");
+	std::ifstream fin("../common/media/skull.txt");
 
 	if(!fin)
-	{
+    {
 		MessageBox(0, L"Models/skull.txt not found.", 0, 0);
 		return;
-	}
+    }
 
 	UINT vcount = 0;
 	UINT tcount = 0;
@@ -234,12 +234,12 @@ void SkullApp::init_buffer()
 
 	std::vector<Vertex> vertices(vcount);
 	for(UINT i = 0; i < vcount; ++i)
-	{
+    {
 		fin >> vertices[i].Pos.x >> vertices[i].Pos.y >> vertices[i].Pos.z;
 		vertices[i].Color = black;
 		// Normal not used in this demo.
 		fin >> nx >> ny >> nz;
-	}
+    }
 
 	fin >> ignore;
 	fin >> ignore;
@@ -248,9 +248,9 @@ void SkullApp::init_buffer()
 	SkullIndexCount = 3 * tcount;
 	std::vector<UINT> indices(SkullIndexCount);
 	for(UINT i = 0; i < tcount; ++i)
-	{
+    {
 		fin >> indices[i*3+0] >> indices[i*3+1] >> indices[i*3+2];
-	}
+    }
 
 	fin.close();
 
@@ -281,7 +281,7 @@ void SkullApp::init_buffer()
 } 
 
 void SkullApp::init_fx()
-	{
+{
 	DWORD shaderFlags = 0;
 #if defined( DEBUG ) || defined( _DEBUG )
 	shaderFlags |= D3D10_SHADER_DEBUG;
@@ -294,16 +294,16 @@ void SkullApp::init_fx()
 
 	// compilationMsgs can store errors or warnings.
 	if( compilationMsgs != 0 )
-		{
+	{
 		MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
 		ReleaseCOM(compilationMsgs);
-		}
+    }
 
 	// Even if there are no compilationMsgs, check to make sure there were no other errors.
 	if(FAILED(hr))
-		{
+	{
 		DXTrace(__FILE__, (DWORD)__LINE__, hr, L"D3DX11CompileFromFile", true);
-		}
+    }
 
 	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), 
 		compiledShader->GetBufferSize(), 
@@ -312,15 +312,15 @@ void SkullApp::init_fx()
 	ReleaseCOM(compiledShader);
 	pTech    = pFX->GetTechniqueByName("ColorTech");
 	pFxWorldViewProj = pFX->GetVariableByName("gWorldViewProj")->AsMatrix();
-	}
+}
 
 void SkullApp::init_layout()
-	{	// Create the vertex input layout.
+{	// Create the vertex input layout.
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-		{
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-		};
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+    };
 
 	// Create the input layout
 	D3DX11_PASS_DESC passDesc;
@@ -328,4 +328,4 @@ void SkullApp::init_layout()
 	HR(pDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature, 
 		passDesc.IAInputSignatureSize, &pInputLayout));
 
-	}
+}

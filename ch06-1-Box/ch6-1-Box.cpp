@@ -14,19 +14,22 @@ class BoxApp :public D3DApp
 		BoxApp(HINSTANCE hInstance);
 		~BoxApp();
 
+		//D3D Function
 		bool Init();
 		void Resize();
 		void UpdateScene(float dt);
 		void Render();
+		void init_buffer();
+		void init_shader();
 
+		//Mouse Function
 		void OnMouseDown(WPARAM btnState, int x, int y);
 		void OnMouseUp(WPARAM btnState, int x, int y);
 		void OnMouseMove(WPARAM btnState, int x, int y);
 
-	    void init_buffer();
-	    void init_shader();
 
 private:
+
 	ID3D11Buffer                *pVertexBuffer;
 	ID3D11Buffer                *pIndexBuffer;
 	ID3DX11Effect               *pEffect;
@@ -34,6 +37,7 @@ private:
 	ID3D11InputLayout           *pInputLayout;
 	ID3DX11EffectMatrixVariable *pEffectWorldViewProj;
 
+	//Matrix Data
 	XMFLOAT4X4 World;
 	XMFLOAT4X4 View;
 	XMFLOAT4X4 Proj;
@@ -42,7 +46,6 @@ private:
 	float Theta;
 	float Phi;
 	float Radius;
-
 	POINT LastMousePos;
 
 };
@@ -65,9 +68,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 
 BoxApp::BoxApp(HINSTANCE hInstance)
-	:D3DApp(hInstance), pVertexBuffer(0), pIndexBuffer(0), pEffect(0), pTechnique(0),
-	pInputLayout(0), pEffectWorldViewProj(0),
-	Theta(1.5 * MathHelper::Pi), Phi(0.25f * MathHelper::Pi), Radius(5.0f)
+	:D3DApp(hInstance), 
+	pVertexBuffer(0), 
+	pIndexBuffer(0),
+	pEffect(0), 
+	pTechnique(0),
+	pInputLayout(0),
+	pEffectWorldViewProj(0),
+	Theta(1.5 * MathHelper::Pi), 
+	Phi(0.25f * MathHelper::Pi),
+	Radius(5.0f)
 {
      WindowTitle = L"Cube Demo";
 	 LastMousePos.x = 0;
@@ -118,6 +128,7 @@ void BoxApp::UpdateScene(float dt)
 	 XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
 	 XMVECTOR target = XMVectorZero();
 	 XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
 	 XMMATRIX v = XMMatrixLookAtLH(pos, target, up);
 	 XMStoreFloat4x4(&View, v);
 
@@ -128,7 +139,7 @@ void BoxApp::Render()
 	assert(pDeviceContext);
 	assert(pSwapChain);
 
-	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Blue));
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
 	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 	pDeviceContext->IASetInputLayout(pInputLayout);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -153,7 +164,7 @@ void BoxApp::Render()
 	{
 		pTechnique->GetPassByIndex(p)->Apply(0, pDeviceContext);
 		pDeviceContext->DrawIndexed(36, 0, 0);
-	}
+}
 
 	HR(pSwapChain->Present(0, 0));
 }
@@ -175,15 +186,11 @@ void BoxApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
     if ( (btnState & MK_LBUTTON) != 0)
 	{
-	  //make each pixel correspond to a quarter of a degree;
 	   float dx = XMConvertToRadians(0.25f * static_cast<float>(x - LastMousePos.x));
 	   float dy = XMConvertToRadians(0.25f * static_cast<float>(y - LastMousePos.y));
 
-	   //update angles based on input to orbit camera around box
 	   Theta += dx;
 	   Phi += dy;
-
-        //restrict the angle phi
 	   Phi = MathHelper::Clamp(Phi, 0.1f, MathHelper::Pi-0.1f);
     }
 	else if ( (btnState * MK_RBUTTON) != 0)
@@ -193,13 +200,16 @@ void BoxApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 	   Radius += dx - dy;
 	   Radius = MathHelper::Clamp(Radius, 3.0f, 15.0f);
-	}
+}
+
 	LastMousePos.x = x;
 	LastMousePos.y = y;
 }
 
 void BoxApp::init_buffer()
 {
+
+	//Create Vertex Buffer
     Vertex VertexData[] =
 	{
 		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), (const float*)&Colors::White   },
@@ -210,7 +220,7 @@ void BoxApp::init_buffer()
 		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), (const float*)&Colors::Yellow  },
 		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), (const float*)&Colors::Cyan    },
 		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), (const float*)&Colors::Magenta }
-	};
+};
 
      D3D11_BUFFER_DESC vbDesc;
 	 vbDesc.Usage               = D3D11_USAGE_IMMUTABLE;
@@ -225,7 +235,7 @@ void BoxApp::init_buffer()
 	 HR( pDevice->CreateBuffer(&vbDesc, &vinitData, &pVertexBuffer) );
 
 
-	 // Create the index buffer
+	 //Create Index Buffer
 	 UINT indices[] = 
 	{
 		 // front face
@@ -290,7 +300,7 @@ void BoxApp::init_shader()
 	 if(FAILED(hr))
 	{
 		 DXTrace(__FILE__, (DWORD)__LINE__, hr, L"D3DX11CompileFromFile", true);
-	}
+}
 
 	 HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), 
 		                             compiledShader->GetBufferSize(), 

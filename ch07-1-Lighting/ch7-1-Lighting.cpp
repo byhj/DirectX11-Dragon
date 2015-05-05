@@ -1,13 +1,13 @@
 #include "d3dApp.h"
-#include "d3dx11effect.h"
 #include "GeometryGenerator.h"
 #include "MathHelper.h"
+#include "LightHelper.h"
 #include "Waves.h"
 
 struct Vertex
 {
 	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
+	XMFLOAT3 Normal;
 };
 
 class WavesApp :public D3DApp
@@ -17,6 +17,8 @@ class WavesApp :public D3DApp
 		~WavesApp();
 
 		float GetHeight(float x, float z)const;
+		XMFLOAT3 GetNormal(float x, float z) const;
+
 		bool Init();
 		void Resize();
 		void UpdateScene(float dt);
@@ -32,16 +34,31 @@ class WavesApp :public D3DApp
 		void init_layout();
 
 	private:
-		ID3D11Buffer* pLandVB;
-		ID3D11Buffer* pLandIB;
-		ID3D11Buffer* pWavesVB;
-		ID3D11Buffer* pWavesIB;
+		ID3D11Buffer                * pLandVB;
+		ID3D11Buffer                * pLandIB;
+		ID3D11Buffer                * pWavesVB;
+		ID3D11Buffer                * pWavesIB;
 
-		ID3DX11Effect *pFX;
-		ID3DX11EffectTechnique *pTech;
-		ID3D11InputLayout *pInputLayout;
+		ID3DX11Effect               *pFX;
+		ID3DX11EffectTechnique      *pTech;
+		ID3D11InputLayout           *pInputLayout;
 		ID3DX11EffectMatrixVariable *pFxWorldViewProj;
-		ID3D11RasterizerState* pWireframeRS;
+		ID3DX11EffectMatrixVariable * mfxWorld;
+		ID3DX11EffectMatrixVariable * mfxWorldInvTranspose;
+		ID3DX11EffectVectorVariable * mfxEyePosW;
+		ID3DX11EffectVariable       * mfxDirLight;
+		ID3DX11EffectVariable       * mfxPointLight;
+		ID3DX11EffectVariable       * mfxSpotLight;
+		ID3DX11EffectVariable       * mfxMaterial;
+		ID3D11RasterizerState       * pWireframeRS;
+
+		//Light 
+		DirectionalLight mDirLight;
+		PointLight mPointLight;
+		SpotLight mSpotLight;
+		Material  mLandMat;
+		Material mWavesMat;
+		XMFLOAT3 mEyePosW;
 
 		XMFLOAT4X4 mGridWorld;
 		XMFLOAT4X4 mWavesWorld;
@@ -54,12 +71,12 @@ class WavesApp :public D3DApp
 		float Phi;
 		float Radius;
 		POINT LastMousePos;
-	
+
 };
 
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					_In_ LPWSTR lpCmdLine, _In_ int nShowCmd )
-{
+	{
 	// Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
@@ -75,10 +92,22 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 
 WavesApp::WavesApp(HINSTANCE hInstance)
-	:D3DApp(hInstance), pLandVB(0), pLandIB(0), pWavesVB(0), pWavesIB(0), 
-	pFX(0), pTech(0),
-	pInputLayout(0), pFxWorldViewProj(0), pWireframeRS(0),
-	Theta(1.5 * MathHelper::Pi), Phi(0.25f * MathHelper::Pi), Radius(200.0f)
+	:D3DApp(hInstance),
+	pLandVB(0), 
+	pLandIB(0),
+	pWavesVB(0), 
+	pWavesIB(0), 
+	pFX(0),
+	pTech(0),
+	pInputLayout(0),
+	pFxWorldViewProj(0),
+	mfxWorld(0), mfxWorldInvTranspose(0), mfxEyePosW(0), 
+	mfxDirLight(0), mfxPointLight(0), mfxSpotLight(0), mfxMaterial(0),
+	mEyePosW(0.0f, 0.0f, 0.0f),
+	pWireframeRS(0),
+	Theta(1.5 * MathHelper::Pi), 
+	Phi(0.25f * MathHelper::Pi), 
+	Radius(200.0f)
 {
 	WindowTitle = L"Box Demo";
 	LastMousePos.x = 0;
@@ -90,6 +119,37 @@ WavesApp::WavesApp(HINSTANCE hInstance)
 	XMStoreFloat4x4(&mView, I);
 	XMStoreFloat4x4(&mProj, I);
 
+	XMMATRIX wavesOffset = XMMatrixTranslation(0.0f, -3.0f, 0.0f);
+	XMStoreFloat4x4(&mWavesWorld, wavesOffset);
+
+	// Directional light.
+	mDirLight.Ambient  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLight.Diffuse  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight.Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight.Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	// Point light--position is changed every frame to animate in UpdateScene function.
+	mPointLight.Ambient  = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	mPointLight.Diffuse  = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	mPointLight.Specular = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	mPointLight.Att      = XMFLOAT3(0.0f, 0.1f, 0.0f);
+	mPointLight.Range    = 25.0f;
+
+	// Spot light--position and direction changed every frame to animate in UpdateScene function.
+	mSpotLight.Ambient  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mSpotLight.Diffuse  = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	mSpotLight.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mSpotLight.Att      = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	mSpotLight.Spot     = 96.0f;
+	mSpotLight.Range    = 10000.0f;
+
+	mLandMat.Ambient  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	mLandMat.Diffuse  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	mLandMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+
+	mWavesMat.Ambient  = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	mWavesMat.Diffuse  = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
+	mWavesMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
 }
 
 
@@ -108,19 +168,12 @@ bool WavesApp::Init()
 {
 	if ( !D3DApp::Init() )
 		return false;
-	mWaves.Init(200, 200, 0.8f, 0.03f, 3.25f, 0.4f);
+	mWaves.Init(160, 160, 1.0f, 0.03f, 3.25f, 0.4f);
 
 	init_buffer();
 	init_fx();
 	init_layout();
-	D3D11_RASTERIZER_DESC wireframeDesc;
-	ZeroMemory(&wireframeDesc, sizeof(D3D11_RASTERIZER_DESC));
-	wireframeDesc.FillMode = D3D11_FILL_WIREFRAME;
-	wireframeDesc.CullMode = D3D11_CULL_BACK;
-	wireframeDesc.FrontCounterClockwise = false;
-	wireframeDesc.DepthClipEnable = true;
 
-	HR(pDevice->CreateRasterizerState(&wireframeDesc, &pWireframeRS));
 	return true;
 }
 
@@ -138,7 +191,7 @@ void WavesApp::UpdateScene(float dt)
 	float x = Radius * sinf(Phi) * cosf(Theta);
 	float z = Radius * sinf(Phi) * sinf(Theta);
 	float y = Radius * cosf(Phi);
-
+    mEyePosW = XMFLOAT3(x, y, z);
 
 	// Build the view matrix.
 	XMVECTOR pos    = XMVectorSet(x, y, z, 1.0f);
@@ -152,12 +205,14 @@ void WavesApp::UpdateScene(float dt)
 	if( (mTimer.TotalTime() - t_base) >= 0.25f )
 	{
 		t_base += 0.25f;
-		DWORD i = 5 + rand() % 190;
-		DWORD j = 5 + rand() % 190;
+
+		DWORD i = 5 + rand() % (mWaves.RowCount()-10);
+		DWORD j = 5 + rand() % (mWaves.ColumnCount()-10);
+
 		float r = MathHelper::RandF(1.0f, 2.0f);
 
 		mWaves.Disturb(i, j, r);
-    }
+	}
 
 	mWaves.Update(dt);
 
@@ -168,11 +223,24 @@ void WavesApp::UpdateScene(float dt)
 	Vertex* v = reinterpret_cast<Vertex*>(mappedData.pData);
 	for(UINT i = 0; i < mWaves.VertexCount(); ++i)
 	{
-		v[i].Pos = mWaves[i];
-		v[i].Color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-    }
+		v[i].Pos    = mWaves[i];
+		v[i].Normal = mWaves.Normal(i);
+	}
 
 	pDeviceContext->Unmap(pWavesVB, 0);
+
+	// Circle light over the land surface.
+	mPointLight.Position.x = 70.0f*cosf( 0.2f*mTimer.TotalTime() );
+	mPointLight.Position.z = 70.0f*sinf( 0.2f*mTimer.TotalTime() );
+	mPointLight.Position.y = MathHelper::Max(GetHeight(mPointLight.Position.x, 
+		                                               mPointLight.Position.z), -3.0f) + 10.0f;
+
+
+	// The spotlight takes on the camera position and is aimed in the
+	// same direction the camera is looking.  In this way, it looks
+	// like we are holding a flashlight.
+	mSpotLight.Position = mEyePosW;
+	XMStoreFloat3(&mSpotLight.Direction, XMVector3Normalize(target - pos));
 }
 
 void WavesApp::Render()
@@ -189,37 +257,54 @@ void WavesApp::Render()
 	UINT offset = 0;
 	XMMATRIX view  = XMLoadFloat4x4(&mView);
 	XMMATRIX proj  = XMLoadFloat4x4(&mProj);
+	XMMATRIX viewProj = view*proj;
+
+	// Set per frame constants.
+	mfxDirLight->SetRawValue(&mDirLight, 0, sizeof(mDirLight));
+	mfxPointLight->SetRawValue(&mPointLight, 0, sizeof(mPointLight));
+	mfxSpotLight->SetRawValue(&mSpotLight, 0, sizeof(mSpotLight));
+	mfxEyePosW->SetRawValue(&mEyePosW, 0, sizeof(mEyePosW));
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	pTech->GetDesc( &techDesc );
 
 	for(UINT p = 0; p < techDesc.Passes; ++p)
 	{
-	  // Draw the land.
-	   pDeviceContext->IASetVertexBuffers(0, 1, &pLandVB, &stride, &offset);
-	   pDeviceContext->IASetIndexBuffer(pLandIB, DXGI_FORMAT_R32_UINT, 0);
+		// Draw the land.
+		pDeviceContext->IASetVertexBuffers(0, 1, &pLandVB, &stride, &offset);
+		pDeviceContext->IASetIndexBuffer(pLandIB, DXGI_FORMAT_R32_UINT, 0);
 
-	   XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
-	   XMMATRIX worldViewProj = world*view*proj;
-	   pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-	   pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
-	   pDeviceContext->DrawIndexed(mGridIndexCount, 0, 0);
+		XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world*view*proj;
 
-	// Draw the waves
-	   pDeviceContext->RSSetState(pWireframeRS);
+		mfxWorld->SetMatrix(reinterpret_cast<float*>(&world));
+		mfxWorldInvTranspose->SetMatrix(reinterpret_cast<float*>(&worldInvTranspose));
+		mfxMaterial->SetRawValue(&mLandMat, 0, sizeof(mLandMat));
+		pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+		
+		pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
+		pDeviceContext->DrawIndexed(mGridIndexCount, 0, 0);
 
-	   pDeviceContext->IASetVertexBuffers(0, 1, &pWavesVB, &stride, &offset);
-	   pDeviceContext->IASetIndexBuffer(pWavesIB, DXGI_FORMAT_R32_UINT, 0);
+		// Draw the waves
+		pDeviceContext->RSSetState(pWireframeRS);
 
-	   world = XMLoadFloat4x4(&mWavesWorld);
-	   worldViewProj = world*view*proj;
-	   pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-	   pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
-	   pDeviceContext->DrawIndexed(3*mWaves.TriangleCount(), 0, 0);
+		pDeviceContext->IASetVertexBuffers(0, 1, &pWavesVB, &stride, &offset);
+		pDeviceContext->IASetIndexBuffer(pWavesIB, DXGI_FORMAT_R32_UINT, 0);
 
-	   // Restore default.
-	   pDeviceContext->RSSetState(0);
-      }
+		// Set per object constants.
+		world = XMLoadFloat4x4(&mWavesWorld);
+		worldInvTranspose = MathHelper::InverseTranspose(world);
+		worldViewProj = world*view*proj;
+
+		mfxWorld->SetMatrix(reinterpret_cast<float*>(&world));
+		mfxWorldInvTranspose->SetMatrix(reinterpret_cast<float*>(&worldInvTranspose));
+		pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+		mfxMaterial->SetRawValue(&mWavesMat, 0, sizeof(mWavesMat));
+
+		pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
+		pDeviceContext->DrawIndexed(3*mWaves.TriangleCount(), 0, 0);
+	}
 
 	HR(pSwapChain->Present(0, 0));
 }
@@ -240,7 +325,7 @@ void WavesApp::OnMouseUp(WPARAM btnState, int x, int y)
 void WavesApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	if ( (btnState & MK_LBUTTON) != 0)
-		{
+	{
 		//make each pixel correspond to a quarter of a degree;
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - LastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - LastMousePos.y));
@@ -253,12 +338,12 @@ void WavesApp::OnMouseMove(WPARAM btnState, int x, int y)
 		Phi = MathHelper::Clamp(Phi, 0.1f, MathHelper::Pi-0.1f);
 	}
 	else if ( (btnState * MK_RBUTTON) != 0)
-		{
+	{
 		float dx = 0.005f * static_cast<float>(x - LastMousePos.x);
 		float dy = 0.005f * static_cast<float>(y - LastMousePos.y);
 
 		Radius += dx - dy;
-		Radius = MathHelper::Clamp(Radius, 50.0f, 500.0f);
+		Radius = MathHelper::Clamp(Radius, 100.0f, 300.0f);
 	}
 	LastMousePos.x = x;
 	LastMousePos.y = y;
@@ -267,6 +352,20 @@ void WavesApp::OnMouseMove(WPARAM btnState, int x, int y)
 float WavesApp::GetHeight(float x, float z) const
 {
 	return 0.3f*( z*sinf(0.1f*x) + x*cosf(0.1f*z) );
+}
+
+XMFLOAT3 WavesApp::GetNormal(float x, float z)const
+{
+	// n = (-df/dx, 1, -df/dz)
+	XMFLOAT3 n(
+		-0.03f*z*cosf(0.1f*x) - 0.3f*cosf(0.1f*z),
+		1.0f,
+		-0.3f*sinf(0.1f*x) + 0.03f*x*sinf(0.1f*z));
+
+	XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
+	XMStoreFloat3(&n, unitNormal);
+
+	return n;
 }
 
 void WavesApp::init_buffer()
@@ -290,36 +389,10 @@ void WavesApp::init_buffer()
 		XMFLOAT3 p = grid.Vertices[i].Position;
 
 		p.y = GetHeight(p.x, p.z);
-
 		vertices[i].Pos   = p;
-
-		// Color the vertex based on its height.
-		if( p.y < -10.0f )
-			{
-			// Sandy beach color.
-			vertices[i].Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
-		}
-		else if( p.y < 5.0f )
-			{
-			// Light yellow-green.
-			vertices[i].Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		}
-		else if( p.y < 12.0f )
-			{
-			// Dark yellow-green.
-			vertices[i].Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
-		}
-		else if( p.y < 20.0f )
-			{
-			// Dark brown.
-			vertices[i].Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
-		}
-		else
-			{
-			// White snow.
-			vertices[i].Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-	}
+		vertices[i].Pos    = p;
+	    vertices[i].Normal = GetNormal(p.x, p.z);
+	 }
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -364,9 +437,9 @@ void WavesApp::init_buffer()
 	UINT n = mWaves.ColumnCount();
 	int k = 0;
 	for(UINT i = 0; i < m-1; ++i)
-	{
-	    for(DWORD j = 0; j < n-1; ++j)
 		{
+		for(DWORD j = 0; j < n-1; ++j)
+			{
 			indices[k]   = i*n+j;
 			indices[k+1] = i*n+j+1;
 			indices[k+2] = (i+1)*n+j;
@@ -376,8 +449,8 @@ void WavesApp::init_buffer()
 			indices[k+5] = (i+1)*n+j+1;
 
 			k += 6; // next quad
-	     }
-     }
+		}
+	}
 
 	//D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -393,44 +466,37 @@ void WavesApp::init_buffer()
 
 void WavesApp::init_fx()
 {
-	DWORD shaderFlags = 0;
-#if defined( DEBUG ) || defined( _DEBUG )
-	shaderFlags |= D3D10_SHADER_DEBUG;
-	shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif
-	ID3D10Blob* compiledShader = 0;
-	ID3D10Blob* compilationMsgs = 0;
-	HRESULT hr = D3DX11CompileFromFile(L"color.fx", 0, 0, 0, "fx_5_0", shaderFlags, 
-		0, 0, &compiledShader, &compilationMsgs, 0);
 
-	// compilationMsgs can store errors or warnings.
-	if( compilationMsgs != 0 )
-		{
-		MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
-		ReleaseCOM(compilationMsgs);
-	}
+	std::ifstream fin("Lighting.fxo", std::ios::binary);
 
-	// Even if there are no compilationMsgs, check to make sure there were no other errors.
-	if(FAILED(hr))
-	{
-		DXTrace(__FILE__, (DWORD)__LINE__, hr, L"D3DX11CompileFromFile", true);
-	}
+	fin.seekg(0, std::ios_base::end);
+	int size = (int)fin.tellg();
+	fin.seekg(0, std::ios_base::beg);
+	std::vector<char> compiledShader(size);
 
-	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), 
-		compiledShader->GetBufferSize(), 
+	fin.read(&compiledShader[0], size);
+	fin.close();
+
+	HR(D3DX11CreateEffectFromMemory(&compiledShader[0], size, 
 		0, pDevice, &pFX));
-	// Done with compiled shader.
-	ReleaseCOM(compiledShader);
-	pTech    = pFX->GetTechniqueByName("ColorTech");
-	pFxWorldViewProj = pFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+
+	pTech                = pFX->GetTechniqueByName("LightTech");
+	pFxWorldViewProj     = pFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	mfxWorld             = pFX->GetVariableByName("gWorld")->AsMatrix();
+	mfxWorldInvTranspose = pFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	mfxEyePosW           = pFX->GetVariableByName("gEyePosW")->AsVector();
+	mfxDirLight          = pFX->GetVariableByName("gDirLight");
+	mfxPointLight        = pFX->GetVariableByName("gPointLight");
+	mfxSpotLight         = pFX->GetVariableByName("gSpotLight");
+	mfxMaterial          = pFX->GetVariableByName("gMaterial");
 }
 
 void WavesApp::init_layout()
 {	// Create the vertex input layout.
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	// Create the input layout

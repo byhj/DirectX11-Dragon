@@ -116,7 +116,7 @@ ShapesApp::ShapesApp(HINSTANCE hInstance)
 
 		XMStoreFloat4x4(&SphereWorld[i*2+0], XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i*5.0f));
 		XMStoreFloat4x4(&SphereWorld[i*2+1], XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i*5.0f));
-	}
+}
 
 }
 
@@ -179,7 +179,7 @@ void ShapesApp::Render()
 	assert(pDeviceContext);
 	assert(pSwapChain);
 
-	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Blue));
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
 	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 	pDeviceContext->IASetInputLayout(pInputLayout);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -223,7 +223,7 @@ void ShapesApp::Render()
 			pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&(world*viewProj)));
 			pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
 			pDeviceContext->DrawIndexed(CylinderIndexCount, CylinderIndexOffset, CylinderVertexOffset);
-		}
+	    }
 
 		// Draw the spheres.
 		for(int i = 0; i < 10; ++i)
@@ -232,8 +232,8 @@ void ShapesApp::Render()
 			pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&(world*viewProj)));
 			pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
 			pDeviceContext->DrawIndexed(SphereIndexCount, SphereIndexOffset, SphereVertexOffset);
-		}
-	}
+	    }
+    }
 
 	HR(pSwapChain->Present(0, 0));
 }
@@ -265,7 +265,7 @@ void ShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 		//restrict the angle phi
 		Phi = MathHelper::Clamp(Phi, 0.1f, MathHelper::Pi-0.1f);
-	}
+}
 	else if ( (btnState * MK_RBUTTON) != 0)
 	{
 		float dx = 0.2f * static_cast<float>(x - LastMousePos.x);
@@ -273,7 +273,7 @@ void ShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 		Radius += dx - dy;
 		Radius = MathHelper::Clamp(Radius, 3.0f, 200.0f);
-	}
+}
 	LastMousePos.x = x;
 	LastMousePos.y = y;
 }
@@ -336,25 +336,25 @@ void ShapesApp::init_buffer()
 	{
 		vertices[k].Pos   = box.Vertices[i].Position;
 		vertices[k].Color = black;
-	}
+}
 
 	for(size_t i = 0; i < grid.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos   = grid.Vertices[i].Position;
 		vertices[k].Color = black;
-	}
+}
 
 	for(size_t i = 0; i < sphere.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos   = sphere.Vertices[i].Position;
 		vertices[k].Color = black;
-	}
+}
 
 	for(size_t i = 0; i < cylinder.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos   = cylinder.Vertices[i].Position;
 		vertices[k].Color = black;
-	}
+}
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -404,13 +404,13 @@ void ShapesApp::init_fx()
 	{
 		MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
 		ReleaseCOM(compilationMsgs);
-	}
+}
 
 	// Even if there are no compilationMsgs, check to make sure there were no other errors.
 	if(FAILED(hr))
 	{
 		DXTrace(__FILE__, (DWORD)__LINE__, hr, L"D3DX11CompileFromFile", true);
-	}
+}
 
 	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), 
 		compiledShader->GetBufferSize(), 
@@ -428,7 +428,7 @@ void ShapesApp::init_layout()
 		{
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-		};
+	};
 
 	// Create the input layout
 	D3DX11_PASS_DESC passDesc;
