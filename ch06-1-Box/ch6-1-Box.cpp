@@ -1,4 +1,3 @@
-
 #include "d3dApp.h"
 #include "d3dx11effect.h"
 #include "MathHelper.h"
@@ -24,24 +23,22 @@ class BoxApp :public D3DApp
 		void OnMouseUp(WPARAM btnState, int x, int y);
 		void OnMouseMove(WPARAM btnState, int x, int y);
 
-private:
-	void init_buffer();
-	void init_fx();
-	void init_layout();
+	    void init_buffer();
+	    void init_shader();
 
 private:
-	ID3D11Buffer *pVB;
-	ID3D11Buffer *pIB;
-	ID3DX11Effect *pFX;
-	ID3DX11EffectTechnique *pTech;
-	ID3D11InputLayout *pInputLayout;
-    ID3DX11EffectMatrixVariable *pFxWorldViewProj;
+	ID3D11Buffer                *pVertexBuffer;
+	ID3D11Buffer                *pIndexBuffer;
+	ID3DX11Effect               *pEffect;
+	ID3DX11EffectTechnique      *pTechnique;
+	ID3D11InputLayout           *pInputLayout;
+	ID3DX11EffectMatrixVariable *pEffectWorldViewProj;
 
-	//mvp matrix
-	XMFLOAT4X4 world;
-	XMFLOAT4X4 view;
-	XMFLOAT4X4 proj;
+	XMFLOAT4X4 World;
+	XMFLOAT4X4 View;
+	XMFLOAT4X4 Proj;
 
+	//Spere Coord
 	float Theta;
 	float Phi;
 	float Radius;
@@ -68,26 +65,26 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 
 BoxApp::BoxApp(HINSTANCE hInstance)
-	:D3DApp(hInstance), pVB(0), pIB(0), pFX(0), pTech(0),
-	pInputLayout(0), pFxWorldViewProj(0),
+	:D3DApp(hInstance), pVertexBuffer(0), pIndexBuffer(0), pEffect(0), pTechnique(0),
+	pInputLayout(0), pEffectWorldViewProj(0),
 	Theta(1.5 * MathHelper::Pi), Phi(0.25f * MathHelper::Pi), Radius(5.0f)
 {
-     WindowTitle = L"Box Demo";
+     WindowTitle = L"Cube Demo";
 	 LastMousePos.x = 0;
 	 LastMousePos.y = 0;
 	 XMMATRIX I = XMMatrixIdentity();
-	 XMStoreFloat4x4(&world, I);
-	 XMStoreFloat4x4(&view, I);
-	 XMStoreFloat4x4(&proj, I);
+	 XMStoreFloat4x4(&World, I);
+	 XMStoreFloat4x4(&View, I);
+	 XMStoreFloat4x4(&Proj, I);
 
 }
 
 
 BoxApp::~BoxApp()
 {
-    ReleaseCOM(pVB);
-    ReleaseCOM(pIB);
-    ReleaseCOM(pFX);
+    ReleaseCOM(pVertexBuffer);
+    ReleaseCOM(pIndexBuffer);
+    ReleaseCOM(pEffect);
     ReleaseCOM(pInputLayout);
 }
 
@@ -97,8 +94,8 @@ bool BoxApp::Init()
 		return false;
 
 	init_buffer();
-	init_fx();
-	init_layout();
+	init_shader();
+
 	return true;
 }
 
@@ -107,7 +104,7 @@ void BoxApp::Resize()
 	D3DApp::Resize();
 
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&proj, P);
+	XMStoreFloat4x4(&Proj, P);
 }
 
 void BoxApp::UpdateScene(float dt)
@@ -122,7 +119,7 @@ void BoxApp::UpdateScene(float dt)
 	 XMVECTOR target = XMVectorZero();
 	 XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	 XMMATRIX v = XMMatrixLookAtLH(pos, target, up);
-	 XMStoreFloat4x4(&view, v);
+	 XMStoreFloat4x4(&View, v);
 
 }
 
@@ -138,25 +135,23 @@ void BoxApp::Render()
 
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	pDeviceContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
-	pDeviceContext->IASetIndexBuffer(pIB, DXGI_FORMAT_R32_UINT, 0);
+	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+	pDeviceContext->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
     
 	// Set constants
-	XMMATRIX w  = XMLoadFloat4x4(&world);
-	XMMATRIX v  = XMLoadFloat4x4(&view);
-	XMMATRIX p  = XMLoadFloat4x4(&proj);
+	XMMATRIX w  = XMLoadFloat4x4(&World);
+	XMMATRIX v  = XMLoadFloat4x4(&View);
+	XMMATRIX p  = XMLoadFloat4x4(&Proj);
 	XMMATRIX worldViewProj = w * v * p;
 
-	pFxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+	pEffectWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 
 	D3DX11_TECHNIQUE_DESC techDesc;
-	pTech->GetDesc( &techDesc );
+	pTechnique->GetDesc( &techDesc );
 
 	for(UINT p = 0; p < techDesc.Passes; ++p)
 	{
-		pTech->GetPassByIndex(p)->Apply(0, pDeviceContext);
-
-		// 36 indices for the box.
+		pTechnique->GetPassByIndex(p)->Apply(0, pDeviceContext);
 		pDeviceContext->DrawIndexed(36, 0, 0);
 	}
 
@@ -218,15 +213,16 @@ void BoxApp::init_buffer()
 	};
 
      D3D11_BUFFER_DESC vbDesc;
-	 vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	 vbDesc.ByteWidth = sizeof(Vertex) * 8;
-	 vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	 vbDesc.CPUAccessFlags = 0;
-	 vbDesc.MiscFlags = 0;
+	 vbDesc.Usage               = D3D11_USAGE_IMMUTABLE;
+	 vbDesc.ByteWidth           = sizeof(Vertex) * 8;
+	 vbDesc.BindFlags           = D3D11_BIND_VERTEX_BUFFER;
+	 vbDesc.CPUAccessFlags      = 0;
+	 vbDesc.MiscFlags           = 0;
 	 vbDesc.StructureByteStride = 0;
+
 	 D3D11_SUBRESOURCE_DATA vinitData;
 	 vinitData.pSysMem = VertexData;
-	 HR( pDevice->CreateBuffer(&vbDesc, &vinitData, &pVB) );
+	 HR( pDevice->CreateBuffer(&vbDesc, &vinitData, &pVertexBuffer) );
 
 
 	 // Create the index buffer
@@ -258,24 +254,26 @@ void BoxApp::init_buffer()
 	 };
 
 	 D3D11_BUFFER_DESC ibd;
-	 ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	 ibd.ByteWidth = sizeof(UINT) * 36;
-	 ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	 ibd.CPUAccessFlags = 0;
-	 ibd.MiscFlags = 0;
+	 ibd.Usage               = D3D11_USAGE_IMMUTABLE;
+	 ibd.ByteWidth           = sizeof(UINT) * 36;
+	 ibd.BindFlags           = D3D11_BIND_INDEX_BUFFER;
+	 ibd.CPUAccessFlags      = 0;
+	 ibd.MiscFlags           = 0;
 	 ibd.StructureByteStride = 0;
+
 	 D3D11_SUBRESOURCE_DATA iinitData;
 	 iinitData.pSysMem = indices;
-	 HR(pDevice->CreateBuffer(&ibd, &iinitData, &pIB));
+	 HR(pDevice->CreateBuffer(&ibd, &iinitData, &pIndexBuffer));
 } 
 
-void BoxApp::init_fx()
+void BoxApp::init_shader()
 {
      DWORD shaderFlags = 0;
 #if defined( DEBUG ) || defined( _DEBUG )
      shaderFlags |= D3D10_SHADER_DEBUG;
      shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
 #endif
+
 	 ID3D10Blob* compiledShader = 0;
 	 ID3D10Blob* compilationMsgs = 0;
 	 HRESULT hr = D3DX11CompileFromFile(L"color.fx", 0, 0, 0, "fx_5_0", shaderFlags, 
@@ -286,7 +284,7 @@ void BoxApp::init_fx()
 	 {
 		 MessageBoxA(0, (char*)compilationMsgs->GetBufferPointer(), 0, 0);
 		 ReleaseCOM(compilationMsgs);
-	}
+	 }
 
 	 // Even if there are no compilationMsgs, check to make sure there were no other errors.
 	 if(FAILED(hr))
@@ -296,25 +294,24 @@ void BoxApp::init_fx()
 
 	 HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), 
 		                             compiledShader->GetBufferSize(), 
-		                             0, pDevice, &pFX));
+		                             0, pDevice, &pEffect));
 	 // Done with compiled shader.
 	 ReleaseCOM(compiledShader);
-	 pTech    = pFX->GetTechniqueByName("ColorTech");
-	 pFxWorldViewProj = pFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	 pTechnique    = pEffect->GetTechniqueByName("ColorTech");
+	 pEffectWorldViewProj = pEffect->GetVariableByName("gWorldViewProj")->AsMatrix();
+
+
+	 // Create the vertex input layout.
+	 D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+	 {
+		 {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		 {"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	 };
+
+	 // Create the input layout
+	 D3DX11_PASS_DESC passDesc;
+	 pTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
+	 HR(pDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature, 
+		                           passDesc.IAInputSignatureSize, &pInputLayout));
 }
 
-void BoxApp::init_layout()
-{	// Create the vertex input layout.
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
-
-	// Create the input layout
-	D3DX11_PASS_DESC passDesc;
-	pTech->GetPassByIndex(0)->GetDesc(&passDesc);
-	HR(pDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature, 
-	   passDesc.IAInputSignatureSize, &pInputLayout));
-
-}

@@ -1,4 +1,3 @@
-
 #include "d3dApp.h"
 #include "d3dx11effect.h"
 #include "MathHelper.h"
@@ -214,7 +213,7 @@ void SkullApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 void SkullApp::init_buffer()
 {
-	std::ifstream fin("skull.txt");
+	std::ifstream fin("../common/media/car.txt");
 
 	if(!fin)
 	{
