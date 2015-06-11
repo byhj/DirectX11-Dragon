@@ -66,17 +66,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\include\d3dApp.cpp" />
-    <ClCompile Include="..\common\include\d3dUtil.cpp" />
-    <ClCompile Include="..\common\include\GameTimer.cpp" />
-    <ClCompile Include="..\common\include\MathHelper.cpp" />
+    <ClCompile Include="..\..\include\d3dApp.cpp" />
+    <ClCompile Include="..\..\include\d3dUtil.cpp" />
+    <ClCompile Include="..\..\include\GameTimer.cpp" />
     <ClCompile Include="ch00-Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\include\d3dApp.h" />
-    <ClInclude Include="..\common\include\d3dUtil.h" />
-    <ClInclude Include="..\common\include\GameTimer.h" />
-    <ClInclude Include="..\common\include\MathHelper.h" />
+    <ClInclude Include="..\..\include\d3dApp.h" />
+    <ClInclude Include="..\..\include\d3dUtil.h" />
+    <ClInclude Include="..\..\include\GameTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

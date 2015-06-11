@@ -15,33 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\include\d3dApp.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\include\d3dUtil.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\include\MathHelper.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\include\GameTimer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="ch00-Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\include\d3dApp.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\d3dUtil.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\GameTimer.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\include\MathHelper.h">
+    <ClInclude Include="..\..\include\d3dApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\include\d3dApp.h">
+    <ClInclude Include="..\..\include\GameTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\include\d3dUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\include\GameTimer.h">
+    <ClInclude Include="..\..\include\d3dUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
