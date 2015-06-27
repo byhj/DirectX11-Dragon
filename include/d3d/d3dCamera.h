@@ -3,6 +3,7 @@
 
 #include <d3d11.h>
 #include <DirectXmath.h>
+#include <iostream>
 
 using namespace DirectX;
 
@@ -24,6 +25,8 @@ public:
 		m_World = I;
 		m_View  = I;
 		m_Proj  = I;
+		aspect  = 1.0f;
+		zoom = 45.0f;
 	}
 
 	void update();
@@ -39,9 +42,10 @@ public:
 	{
 		return pos;
 	}
-	void SetRadius(float r)
+	void Init(float r, float asp)
 	{
 		m_Radius = r;
+		aspect  =  asp;
 	}
 
 	void OnMouseDown(WPARAM btnState, int x, int y, HWND hWnd);
@@ -61,6 +65,8 @@ private:
 	XMMATRIX m_Proj;
 	XMFLOAT3 pos;
 	XMFLOAT3 target;
+	float aspect;
+	float zoom;
 };
 
 void D3DCamera::update()
@@ -79,14 +85,12 @@ void D3DCamera::update()
 	XMStoreFloat3(&this->target, target);
 
 	m_View = XMMatrixLookAtLH(pos, target, up);
-	//m_Proj  = XMMatrixPerspectiveFovLH( D3DXToRadian(45.0f), aspect, 1.0f, 1000.0f);
+	m_Proj  = XMMatrixPerspectiveFovLH(XMConvertToRadians(zoom), aspect, 1.0f, 1000.0f);
 }
 
 void D3DCamera::OnMouseWheel(WPARAM btnState, int x, int y, float aspect)
 {
-	static float zoom = 45.0f;
 	zoom += x * 0.01f;
-	m_Proj  = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspect, 1.0f, 1000.0f);
 }
 
 void D3DCamera::OnMouseDown(WPARAM btnState, int x, int y, HWND hWnd)
