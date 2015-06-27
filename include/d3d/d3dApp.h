@@ -63,6 +63,10 @@ public:
 	virtual void v_MouseMove() {}
 	virtual void v_MouseUp()   {}
 
+	float GetAspect()
+	{
+		return static_cast<float>(m_ScreenWidth) / static_cast<float>(m_ScreenHeight);
+	}
 	//We make public inherit can access these data 
 protected:
 

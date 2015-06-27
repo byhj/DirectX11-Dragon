@@ -1,179 +1,138 @@
 #ifndef D3DCAMERA_H
 #define D3DCAMERA_H
 
-#include <dinput.h>
 #include <d3d11.h>
-#include <xnamath.h>
+#include <DirectXmath.h>
+
+using namespace DirectX;
+
+const float Pi = 3.1415926535f;
+
+float Clamp(const float& x, const float& low, const float& high)
+{
+	return x < low ? low : (x > high ? high : x); 
+}
 
 class D3DCamera
 {
 public:
-	D3DCamera()
+	D3DCamera():m_Theta(1.5f * Pi), m_Phi(0.25f * Pi), m_Radius(5.0f)
 	{
-		DefaultForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-		DefaultRight   = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-		camForward     = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-		camRight       = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-		moveLeftRight   = 0.0f;
-		moveBackForward = 0.0f;
-
-		camYaw = 0.0f;
-		camPitch = 0.0f;
-
-		camUp  = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
-		camPosition    = XMVectorSet( 0.0f, 5.0f, -8.0f, 0.0f );
-		camTarget      = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
-		camView        = XMMatrixLookAtLH(camPosition, camTarget, camUp );
-
-		rot = 0.01f;
+		m_LastMousePos.x = 0;
+		m_LastMousePos.y = 0;
+		XMMATRIX I = XMMatrixIdentity();
+		m_World = I;
+		m_View  = I;
+		m_Proj  = I;
 	}
 
-	bool InitDirectInput(HINSTANCE hInstance , HWND hWnd);
-	void DetectInput(double time , HWND hWnd);
-	void UpdateCamera();
+	void update();
+	XMMATRIX GetViewMatrix() const 
+	{
+		return m_View;
+	}
+	XMMATRIX GetProjMatrix() const
+	{
+		return m_Proj;
+	}
+	XMFLOAT3 GetPos()
+	{
+		return pos;
+	}
+	void SetRadius(float r)
+	{
+		m_Radius = r;
+	}
 
-	XMMATRIX GetViewMatrix()
-	{
-		return camView;
-	}
-	XMVECTOR GetCamPos()
-	{
-		return camPosition;
-	}
-	XMVECTOR GetCamTarget()
-	{
-		return camTarget;
-	}
+	void OnMouseDown(WPARAM btnState, int x, int y, HWND hWnd);
+	void OnMouseMove(WPARAM btnState, int x, int y);
+	void OnMouseUp(WPARAM btnState, int x, int y);
+	void OnMouseWheel(WPARAM btnState, int x, int y, float aspect);
 
 private:
-	IDirectInputDevice8* m_pDIKeyboard;
-	IDirectInputDevice8* m_pDIMouse;
-	DIMOUSESTATE mouseLastState;
-	LPDIRECTINPUT8 DirectInput;
 
-	XMVECTOR DefaultForward ;
-	XMVECTOR DefaultRight   ;
-	XMVECTOR camForward     ;
-	XMVECTOR camRight       ;
+	float m_Theta;
+	float m_Phi;
+	float m_Radius;
+	POINT m_LastMousePos;
 
-	XMMATRIX camRotationMatrix;
-	XMMATRIX camView;
-	XMMATRIX camProjection;	
-	XMVECTOR camPosition;
-	XMVECTOR camTarget;
-	XMVECTOR camUp;
-
-	float rot;
-	float moveLeftRight  ;
-	float moveBackForward;
-
-	float camYaw   ;
-	float camPitch ;
+	XMMATRIX m_World;
+	XMMATRIX m_View;
+	XMMATRIX m_Proj;
+	XMFLOAT3 pos;
+	XMFLOAT3 target;
 };
 
-bool D3DCamera::InitDirectInput(HINSTANCE hInstance, HWND hWnd)
+void D3DCamera::update()
 {
-	HRESULT hr;
-	hr = DirectInput8Create(hInstance,
-		DIRECTINPUT_VERSION,
-		IID_IDirectInput8,
-		(void**)&DirectInput,
-		NULL); 
+	// Convert Spherical to Cartesian coordinates.
+	float x = m_Radius * sinf(m_Phi) * cosf(m_Theta);
+	float z = m_Radius * sinf(m_Phi) * sinf(m_Theta);
+	float y = m_Radius * cosf(m_Phi);
 
-	hr = DirectInput->CreateDevice(GUID_SysKeyboard, &m_pDIKeyboard, NULL);
-	hr = DirectInput->CreateDevice(GUID_SysMouse, &m_pDIMouse, NULL);
+	// Build the view matrix.
+	XMVECTOR pos    = XMVectorSet(x, y, z, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-	hr = m_pDIKeyboard->SetDataFormat(&c_dfDIKeyboard);
-	hr = m_pDIKeyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	XMStoreFloat3(&this->pos, pos);
+	XMStoreFloat3(&this->target, target);
 
-	hr = m_pDIMouse->SetDataFormat(&c_dfDIMouse);
-	hr = m_pDIMouse->SetCooperativeLevel(hWnd, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND);
-
-	return true;
+	m_View = XMMatrixLookAtLH(pos, target, up);
+	//m_Proj  = XMMatrixPerspectiveFovLH( D3DXToRadian(45.0f), aspect, 1.0f, 1000.0f);
 }
 
-void D3DCamera::DetectInput(double time, HWND hWnd)
+void D3DCamera::OnMouseWheel(WPARAM btnState, int x, int y, float aspect)
 {
-	DIMOUSESTATE mouseCurrState;
-
-	BYTE keyboardState[256];
-
-	//Acquire current mouse and key state
-	m_pDIKeyboard->Acquire();
-	m_pDIMouse->Acquire();
-	m_pDIMouse->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
-	m_pDIKeyboard->GetDeviceState(sizeof(keyboardState),(LPVOID)&keyboardState);
-
-	if(keyboardState[DIK_ESCAPE] & 0x80)
-		PostMessage(hWnd, WM_DESTROY, 0, 0);
-
-	float speed = 15.0f * time;
-
-	//Enter ADSW to move camera left right back forword
-
-	if(keyboardState[DIK_A] & 0x80)
-	{
-		moveLeftRight -= speed;
-	}
-	if(keyboardState[DIK_D] & 0x80)
-	{
-		moveLeftRight += speed;
-	}
-	if(keyboardState[DIK_W] & 0x80)
-	{
-		moveBackForward += speed;
-	}
-	if(keyboardState[DIK_S] & 0x80)
-	{
-		moveBackForward -= speed;
-	}
-	//Use mouse to change the rotation matrix
-	if((mouseCurrState.lX != mouseLastState.lX) || (mouseCurrState.lY != mouseLastState.lY))
-	{
-		camYaw += mouseCurrState.lX * 0.001f;
-		camPitch += mouseCurrState.lY * 0.001f;
-
-		mouseLastState = mouseCurrState;
-	}
-
-	UpdateCamera();
-
-	return;
+	static float zoom = 45.0f;
+	zoom += x * 0.01f;
+	m_Proj  = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), aspect, 1.0f, 1000.0f);
 }
 
-void D3DCamera::UpdateCamera()
-{	
-	//Rotating the Camera by euler angle
-	camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
-	camTarget         = XMVector3TransformCoord(DefaultForward, camRotationMatrix );
-	camTarget         = XMVector3Normalize(camTarget);
+void D3DCamera::OnMouseDown(WPARAM btnState, int x, int y, HWND hWnd)
+{
+	m_LastMousePos.x = x;
+	m_LastMousePos.y = y;
 
-	XMMATRIX RotateYTempMatrix;
-	RotateYTempMatrix = XMMatrixRotationY(camYaw);
+	SetCapture(hWnd );
+}
 
-	//We only move the xz plane by axis y
-	//Update the camera vector
-	camRight   = XMVector3TransformCoord(DefaultRight, RotateYTempMatrix);
-	camUp      = XMVector3TransformCoord(camUp, RotateYTempMatrix);
-	camForward = XMVector3TransformCoord(DefaultForward, RotateYTempMatrix);
+void D3DCamera::OnMouseUp(WPARAM btnState, int x, int y)
+{
+	ReleaseCapture();
+}
 
-	// Free-Look Camera
-	camRight = XMVector3TransformCoord(DefaultRight, camRotationMatrix);
-	camForward = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
-	camUp = XMVector3Cross(camForward, camRight);
+void D3DCamera::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if( (btnState & MK_LBUTTON) != 0 )
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - m_LastMousePos.x));
+		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - m_LastMousePos.y));
 
-	//Moving the Camera
-	camPosition += moveLeftRight*camRight;
-	camPosition += moveBackForward*camForward;
+		// Update angles based on input to orbit camera around box.
+		m_Theta += dx;
+		m_Phi   += dy;
 
-	moveLeftRight = 0.0f;
-	moveBackForward = 0.0f;
+		// Restrict the angle mPhi.
+		m_Phi = Clamp(m_Phi, 0.1f, Pi-0.1f);
+	}
 
-	camTarget = camPosition + camTarget;	
+	else if( (btnState & MK_RBUTTON) != 0 )
+	{
+		// Make each pixel correspond to 0.005 unit in the scene.
+		float dx = 0.005f*static_cast<float>(x - m_LastMousePos.x);
+		float dy = 0.005f*static_cast<float>(y - m_LastMousePos.y);
 
-	//Set the camera matrix
-	camView = XMMatrixLookAtLH( camPosition, camTarget, camUp );
+		// Update the camera radius based on input.
+		m_Radius += dx - dy;
 
+		// Restrict the radius.
+		m_Radius = Clamp(m_Radius, 3.0f, 15.0f);
+	}
+
+	m_LastMousePos.x = x;
+	m_LastMousePos.y = y;
 }
 
 
