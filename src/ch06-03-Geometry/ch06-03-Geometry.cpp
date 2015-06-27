@@ -13,20 +13,22 @@
 #include "d3d/d3dTimer.h"
 #include "d3d/d3dFont.h"
 
-#include "cube.h"
+#include "geometry.h"
 
 class D3DRenderSystem: public D3DApp
 {
 public:
 	D3DRenderSystem() 
 	{
-		m_AppName = L"Hill";
+		m_AppName = L"Cube";
 
 		m_pSwapChain             = NULL;
 		m_pD3D11Device           = NULL;
 		m_pD3D11DeviceContext    = NULL;
-		m_pD3D11RenderTargetView = NULL;
-
+		m_pRenderTargetView      = NULL;
+		m_pDepthStencilView      = NULL;
+		m_pDepthStencilBuffer    = NULL;
+		m_pRasterState           = NULL;
 		fps = 0.0f;
 	}
 	~D3DRenderSystem(){}
@@ -42,15 +44,16 @@ public:
 	void v_Render()
 	{
 		static float bgColor[4] = {0.2f, 0.4f, 0.5f, 1.0f};
-		m_pD3D11DeviceContext->OMSetRenderTargets(1, &m_pD3D11RenderTargetView, NULL);
-		m_pD3D11DeviceContext->ClearRenderTargetView(m_pD3D11RenderTargetView, bgColor);
+		m_pD3D11DeviceContext->OMSetRenderTargets( 1, &m_pRenderTargetView, m_pDepthStencilView);
+		m_pD3D11DeviceContext->ClearRenderTargetView(m_pRenderTargetView, bgColor);
+	    m_pD3D11DeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
 		m_camera.update();
 		Model = XMMatrixIdentity();
 		View  = m_camera.GetViewMatrix();
 		Proj  = m_camera.GetProjMatrix();
-		m_cube.Render(m_pD3D11DeviceContext, Model, View, Proj);
+		m_geometry.Render(m_pD3D11DeviceContext, Model, View, Proj);
 
 		DrawMessage();
 
@@ -62,7 +65,10 @@ public:
 		ReleaseCOM(m_pSwapChain);
 		ReleaseCOM(m_pD3D11Device);
 		ReleaseCOM(m_pD3D11DeviceContext);
-		ReleaseCOM(m_pD3D11RenderTargetView);
+		ReleaseCOM(m_pRenderTargetView);
+		ReleaseCOM(m_pDepthStencilView  )
+		ReleaseCOM(m_pDepthStencilBuffer)
+		ReleaseCOM(m_pRasterState);
 	}
 	void v_OnMouseDown(WPARAM btnState, int x, int y);
 	void v_OnMouseMove(WPARAM btnState, int x, int y);
@@ -80,13 +86,15 @@ private:
 	D3DCamera m_camera;
 	D3DFont   m_font;
 	D3DTimer  m_timer;
-	Cube      m_cube;
+	Geometry  m_geometry;
 
 	IDXGISwapChain         *m_pSwapChain;
 	ID3D11Device           *m_pD3D11Device;
 	ID3D11DeviceContext    *m_pD3D11DeviceContext;
-	ID3D11RenderTargetView *m_pD3D11RenderTargetView;
-
+	ID3D11RenderTargetView *m_pRenderTargetView;
+	ID3D11DepthStencilView *m_pDepthStencilView;
+	ID3D11Texture2D        *m_pDepthStencilBuffer;
+	ID3D11RasterizerState  *m_pRasterState;
 	XMMATRIX Model;
 	XMMATRIX View;
 	XMMATRIX Proj;
@@ -132,9 +140,36 @@ void D3DRenderSystem::init_device()
 	//Create backbuffer, buffer also is a texture
 	ID3D11Texture2D *pBackBuffer;
 	hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
-	hr = m_pD3D11Device->CreateRenderTargetView(pBackBuffer, NULL, &m_pD3D11RenderTargetView);
+	hr = m_pD3D11Device->CreateRenderTargetView(pBackBuffer, NULL, &m_pRenderTargetView);
 	DebugHR(hr)
 	pBackBuffer->Release();
+
+	/////////////////////Describe our Depth/Stencil Buffer///////////////////////////
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+
+	depthStencilDesc.Width              = m_ScreenWidth;
+	depthStencilDesc.Height             = m_ScreenHeight;
+	depthStencilDesc.MipLevels          = 1;
+	depthStencilDesc.ArraySize          = 1;
+	depthStencilDesc.Format             = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.SampleDesc.Count   = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Usage              = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags          = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags     = 0; 
+	depthStencilDesc.MiscFlags          = 0;
+
+	m_pD3D11Device->CreateTexture2D(&depthStencilDesc, NULL, &m_pDepthStencilBuffer);
+	m_pD3D11Device->CreateDepthStencilView(m_pDepthStencilBuffer, NULL, &m_pDepthStencilView);
+
+	//////////////////////Raterizer State/////////////////////////////
+	D3D11_RASTERIZER_DESC rasterDesc;
+	ZeroMemory(&rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
+	rasterDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterDesc.CullMode = D3D11_CULL_BACK;
+	rasterDesc.FrontCounterClockwise = false;
+	hr = m_pD3D11Device->CreateRasterizerState(&rasterDesc, &m_pRasterState);
+	m_pD3D11DeviceContext->RSSetState(m_pRasterState);
 
 	///////////////////////Get Device Information/////////////////////////////////
 	unsigned int numModes, i, numerator, denominator, stringLength;
@@ -156,14 +191,14 @@ void D3DRenderSystem::init_device()
 
 void D3DRenderSystem::init_object()
 {
-	m_camera.Init(5.0f, GetAspect());
+	m_camera.Init(15.0f, GetAspect());
 
 	m_timer.Reset();
 
 	m_font.init(m_pD3D11Device, L"Arial");
 
-	m_cube.init_buffer(m_pD3D11Device, m_pD3D11DeviceContext);
-	m_cube.init_shader(m_pD3D11Device, m_hWnd);
+	m_geometry.init_buffer(m_pD3D11Device, m_pD3D11DeviceContext);
+	m_geometry.init_shader(m_pD3D11Device, m_hWnd);
 }
 
 void D3DRenderSystem::init_camera()

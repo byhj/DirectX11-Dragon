@@ -121,7 +121,7 @@ void D3DCamera::OnMouseMove(WPARAM btnState, int x, int y)
 		// Restrict the angle mPhi.
 		m_Phi = Clamp(m_Phi, 0.1f, Pi-0.1f);
 	}
-
+	/*
 	else if( (btnState & MK_RBUTTON) != 0 )
 	{
 		// Make each pixel correspond to 0.005 unit in the scene.
@@ -134,7 +134,7 @@ void D3DCamera::OnMouseMove(WPARAM btnState, int x, int y)
 		// Restrict the radius.
 		m_Radius = Clamp(m_Radius, 3.0f, 15.0f);
 	}
-
+	*/
 	m_LastMousePos.x = x;
 	m_LastMousePos.y = y;
 }

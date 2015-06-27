@@ -210,6 +210,8 @@ void D3DRenderSystem::init_camera()
 	vp.TopLeftY = 0;
 	vp.Width    = static_cast<FLOAT>(m_ScreenWidth);
 	vp.Height   = static_cast<FLOAT>(m_ScreenHeight);
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
 	m_pD3D11DeviceContext->RSSetViewports(1, &vp);
 
 	//MVP Matrix
