@@ -20,11 +20,11 @@ void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	m_VertexCount = ARRAYSIZE(VertexData);
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
-	vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	vertexBufferDesc.ByteWidth = sizeof(Vertex) * m_VertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.Usage               = D3D11_USAGE_IMMUTABLE;
+	vertexBufferDesc.ByteWidth           = sizeof(Vertex) * m_VertexCount;
+	vertexBufferDesc.BindFlags           = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags      = 0;
+	vertexBufferDesc.MiscFlags           = 0;
 	vertexBufferDesc.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA VBO;
@@ -61,11 +61,11 @@ void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	m_IndexCount = ARRAYSIZE(IndexData);
 
 	D3D11_BUFFER_DESC indexBufferDesc;
-	indexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	indexBufferDesc.ByteWidth = sizeof(UINT) * m_IndexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.Usage               = D3D11_USAGE_IMMUTABLE;
+	indexBufferDesc.ByteWidth           = sizeof(UINT) * m_IndexCount;
+	indexBufferDesc.BindFlags           = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags      = 0;
+	indexBufferDesc.MiscFlags           = 0;
 	indexBufferDesc.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA IBO;
@@ -101,7 +101,7 @@ void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	pInputLayoutDesc[1].SemanticIndex        = 0;
 	pInputLayoutDesc[1].Format               = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	pInputLayoutDesc[1].InputSlot            = 0;
-	pInputLayoutDesc[1].AlignedByteOffset    = D3D11_APPEND_ALIGNED_ELEMENT;
+	pInputLayoutDesc[1].AlignedByteOffset    = 12;
 	pInputLayoutDesc[1].InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
 	pInputLayoutDesc[1].InstanceDataStepRate = 0;
 

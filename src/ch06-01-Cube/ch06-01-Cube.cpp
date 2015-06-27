@@ -20,12 +20,14 @@ class D3DRenderSystem: public D3DApp
 public:
 	D3DRenderSystem() 
 	{
-		m_AppName = L"InitD3D";
+		m_AppName = L"Cube";
 
 		m_pSwapChain             = NULL;
 		m_pD3D11Device           = NULL;
 		m_pD3D11DeviceContext    = NULL;
 		m_pD3D11RenderTargetView = NULL;
+
+		fps = 0.0f;
 	}
 	~D3DRenderSystem(){}
 
@@ -40,11 +42,16 @@ public:
 	void v_Render()
 	{
 		static float bgColor[4] = {0.2f, 0.4f, 0.5f, 1.0f};
+		m_pD3D11DeviceContext->OMSetRenderTargets(1, &m_pD3D11RenderTargetView, NULL);
 		m_pD3D11DeviceContext->ClearRenderTargetView(m_pD3D11RenderTargetView, bgColor);
 		m_pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		Model = XMMatrixIdentity();
+		m_camera.update();
+		View  = m_camera.GetViewMatrix();
 
 		m_cube.Render(m_pD3D11DeviceContext, Model, View, Proj);
+
+		DrawMessage();
 
 		m_pSwapChain->Present(0, 0);
 	}
@@ -56,11 +63,16 @@ public:
 		ReleaseCOM(m_pD3D11DeviceContext);
 		ReleaseCOM(m_pD3D11RenderTargetView);
 	}
+	void v_OnMouseDown(WPARAM btnState, int x, int y);
+	void v_OnMouseMove(WPARAM btnState, int x, int y);
+	void v_OnMouseUp(WPARAM btnState, int x, int y);
+	void v_OnMouseWheel(WPARAM btnState, int x, int y);
 
 private:
 	void init_device();
 	void init_object();
 	void init_camera();
+	void DrawMessage();
 
 private:
 
@@ -77,9 +89,65 @@ private:
 	XMMATRIX Model;
 	XMMATRIX View;
 	XMMATRIX Proj;
+
+	int m_videoCardMemory;
+	WCHAR m_videoCardInfo[255];
+	float fps;
 };
 
 CALL_MAIN(D3DRenderSystem)
+
+
+void  D3DRenderSystem::v_OnMouseDown(WPARAM btnState, int x, int y)
+{
+	m_camera.OnMouseDown(btnState, x, y, m_hWnd);
+}
+
+void  D3DRenderSystem::v_OnMouseMove(WPARAM btnState, int x, int y)
+{
+	m_camera.OnMouseMove(btnState, x, y);
+}
+
+void  D3DRenderSystem::v_OnMouseUp(WPARAM btnState, int x, int y)
+{
+	m_camera.OnMouseUp(btnState, x, y);
+}
+
+void  D3DRenderSystem::v_OnMouseWheel(WPARAM btnState, int x, int y)
+{
+	m_camera.OnMouseWheel(btnState, x, y, GetAspect());
+}
+
+void D3DRenderSystem::DrawMessage()
+{
+	static bool flag = true;
+	if (flag)
+	{
+		m_timer.Start();
+		flag = false;
+	}
+	m_timer.Count();
+	static int frameCnt = 0;
+	static float timeElapsed = 0.0f;
+
+	frameCnt++;
+	if(m_timer.GetTotalTime() - timeElapsed >= 1.0f)
+	{
+		fps = frameCnt;
+		frameCnt = 0;
+		timeElapsed += 1.0f;
+	}	
+	static WCHAR frameStr[255];
+	wsprintfW(frameStr, L"FPS: %u", (UINT)fps);
+
+	m_font.drawText(m_pD3D11DeviceContext, frameStr, 22.0f, 10.0f, 10.0f, 0xff0099ff);
+
+	WCHAR WinInfo[255];
+	swprintf(WinInfo, L"Window Size: %d x %d", m_ScreenWidth, m_ScreenHeight);
+	m_font.drawText(m_pD3D11DeviceContext, WinInfo, 22.0f, 10.0f, 40.0f, 0xff0099ff);
+	m_font.drawText(m_pD3D11DeviceContext, m_videoCardInfo, 22.0f, 10.0f, 70.0f, 0xff0099ff);
+
+}
 
 void D3DRenderSystem::init_device()
 {
@@ -116,8 +184,25 @@ void D3DRenderSystem::init_device()
 	ID3D11Texture2D *pBackBuffer;
 	hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
 	hr = m_pD3D11Device->CreateRenderTargetView(pBackBuffer, NULL, &m_pD3D11RenderTargetView);
+	DebugHR(hr)
 	pBackBuffer->Release();
 
+
+	unsigned int numModes, i, numerator, denominator, stringLength;
+	IDXGIFactory* factory;
+	IDXGIAdapter* adapter;
+	IDXGISurface *surface;
+	DXGI_ADAPTER_DESC adapterDesc;
+
+	// Create a DirectX graphics interface factory.
+	CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
+	// Use the factory to create an adapter for the primary graphics interface (video card).
+	factory->EnumAdapters(0, &adapter);
+	adapter->GetDesc(&adapterDesc);
+	m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
+
+	// Convert the name of the video card to a character array and store it.
+	swprintf(m_videoCardInfo,L"Video Card  : %ls", adapterDesc.Description);
 }
 
 void D3DRenderSystem::init_object()
@@ -125,6 +210,8 @@ void D3DRenderSystem::init_object()
 	m_camera.SetRadius(5.0f);
 
 	m_timer.Reset();
+
+	m_font.init(m_pD3D11Device, L"Arial");
 
 	m_cube.init_buffer(m_pD3D11Device, m_pD3D11DeviceContext);
 	m_cube.init_shader(m_pD3D11Device, m_hWnd);

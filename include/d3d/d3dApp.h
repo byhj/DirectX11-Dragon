@@ -23,6 +23,7 @@ with different inherit class. You can rewirte the interface for different functi
 #endif
 
 #include <windows.h>
+#include <WindowsX.h>
 
 #include <dxgi.h>
 #include <d3d11.h>
@@ -58,10 +59,11 @@ public:
 	virtual void v_Render()   {}
 	virtual void v_Update()   {}
 
-	//Message loop for mouse 
-	virtual void v_MouseDown() {}
-	virtual void v_MouseMove() {}
-	virtual void v_MouseUp()   {}
+	// Convenience overrides for handling mouse input.
+	virtual void v_OnMouseDown(WPARAM btnState, int x, int y){ }
+	virtual void v_OnMouseUp(WPARAM btnState, int x, int y)  { }
+	virtual void v_OnMouseMove(WPARAM btnState, int x, int y){ }
+	virtual void v_OnMouseWheel(WPARAM btnState, int x, int y) { }
 
 	float GetAspect()
 	{
@@ -193,12 +195,34 @@ LRESULT CALLBACK D3DApp::MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 {
 	switch (uMsg)
 	{
-	    default:
-		{
-			return DefWindowProc(hWnd, uMsg, wParam, lParam);
-		}
-	} 
+	    case WM_KEYDOWN:
+	    	{
+	    		if(wParam == VK_ESCAPE)
+	    			PostMessage(m_hWnd, WM_DESTROY, 0, 0);
+	    	}
 
+	    case WM_LBUTTONDOWN:
+	    case WM_MBUTTONDOWN:
+	    case WM_RBUTTONDOWN:
+	    	v_OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+	    	return 0;
+
+	    case WM_LBUTTONUP:
+	    case WM_MBUTTONUP:
+	    case WM_RBUTTONUP:
+	    	v_OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+	    	return 0;
+
+	    case WM_MOUSEMOVE:
+	    	v_OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+	    	return 0;
+
+	    case WM_MOUSEWHEEL:
+	    	v_OnMouseWheel(wParam, GET_WHEEL_DELTA_WPARAM(wParam), GET_Y_LPARAM(lParam));
+
+	    default:
+		    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	} 
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)

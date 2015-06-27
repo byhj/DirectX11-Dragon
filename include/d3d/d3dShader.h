@@ -26,7 +26,7 @@ class D3DShader
 {
 public:
 	D3DShader(): pVS_Shader(0), pPS_Shader(0), pHS_Shader(0), pDS_Shader(0),
-		         pGS_Shader(0), pCS_Shader(0), pD3D11Device(0), hWnd(0) {}
+		         pGS_Shader(0), pCS_Shader(0), pD3D11Device(0), pInputLayout(0), hWnd(0) {}
 	~D3DShader() {}
 
 	void init(ID3D11Device *pD3D11Device, HWND hWnd);
@@ -48,8 +48,9 @@ private:
 	ID3D11GeometryShader  *pGS_Shader;
 	ID3D11PixelShader     *pPS_Shader;
 	ID3D11ComputeShader   *pCS_Shader;
+
 	ID3D11InputLayout     *pInputLayout;
-	ID3D11Device *pD3D11Device;
+	ID3D11Device          *pD3D11Device;
 	HWND hWnd;
 };
 

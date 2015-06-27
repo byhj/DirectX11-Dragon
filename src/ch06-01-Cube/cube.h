@@ -32,13 +32,14 @@ public:
 	   pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0 );
 	   pD3D11DeviceContext->VSSetConstantBuffers( 0, 1, &m_pMVPBuffer);
 
-	   // Set vertex buffer stride and offset.=
+	   // Set vertex buffer stride and offset
 	   unsigned int stride;
 	   unsigned int offset;
 	   stride = sizeof(Vertex); 
 	   offset = 0;
 	   pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 	   pD3D11DeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
 	   CubeShader.use(pD3D11DeviceContext);
 	   pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 
@@ -76,6 +77,7 @@ private:
 	ID3D11Buffer        *m_pIndexBuffer;
 	ID3D11Buffer        *m_pMVPBuffer;
 	ID3D11InputLayout   *m_pInputLayout;
+
 	int m_VertexCount;
 	int m_IndexCount;
 };
