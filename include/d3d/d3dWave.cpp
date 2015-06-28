@@ -7,7 +7,7 @@
 D3DWave::D3DWave()
 	: mNumRows(0), mNumCols(0), mVertexCount(0), mTriangleCount(0), 
 	mK1(0.0f), mK2(0.0f), mK3(0.0f), mTimeStep(0.0f), mSpatialStep(0.0f),
-	mPrevSolution(0), mCurrSolution(0)
+	mPrevSolution(0), mCurrSolution(0), mNormals(0), mTangentX(0)
 {
 }
 
@@ -15,6 +15,8 @@ D3DWave::~D3DWave()
 {
 	delete[] mPrevSolution;
 	delete[] mCurrSolution;
+	delete[] mNormals;
+	delete[] mTangentX;
 }
 
 UINT D3DWave::RowCount()const
@@ -35,6 +37,15 @@ UINT D3DWave::VertexCount()const
 UINT D3DWave::TriangleCount()const
 {
 	return mTriangleCount;
+}
+float D3DWave::Width()const
+{
+	return mNumCols*mSpatialStep;
+}
+
+float D3DWave::Depth()const
+{
+	return mNumRows*mSpatialStep;
 }
 
 void D3DWave::Init(UINT m, UINT n, float dx, float dt, float speed, float damping)
@@ -57,9 +68,13 @@ void D3DWave::Init(UINT m, UINT n, float dx, float dt, float speed, float dampin
 	// In case Init() called again.
 	delete[] mPrevSolution;
 	delete[] mCurrSolution;
+	delete[] mNormals;
+	delete[] mTangentX;
 
 	mPrevSolution = new XMFLOAT3[m*n];
 	mCurrSolution = new XMFLOAT3[m*n];
+	mNormals      = new XMFLOAT3[m*n];
+	mTangentX     = new XMFLOAT3[m*n];
 
 	// Generate grid vertices in system memory.
 
@@ -74,6 +89,8 @@ void D3DWave::Init(UINT m, UINT n, float dx, float dt, float speed, float dampin
 
 			mPrevSolution[i*n+j] = XMFLOAT3(x, 0.0f, z);
 			mCurrSolution[i*n+j] = XMFLOAT3(x, 0.0f, z);
+			mNormals[i*n+j]      = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			mTangentX[i*n+j]     = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		}
 	}
 }
@@ -89,9 +106,9 @@ void D3DWave::Update(float dt)
 	if( t >= mTimeStep )
 	{
 		// Only update interior points; we use zero boundary conditions.
-		for(DWORD i = 1; i < mNumRows-1; ++i)
+		for(UINT i = 1; i < mNumRows-1; ++i)
 		{
-			for(DWORD j = 1; j < mNumCols-1; ++j)
+			for(UINT j = 1; j < mNumCols-1; ++j)
 			{
 				// After this update we will be discarding the old previous
 				// buffer, so overwrite that buffer with the new update.
@@ -118,6 +135,30 @@ void D3DWave::Update(float dt)
 		std::swap(mPrevSolution, mCurrSolution);
 
 		t = 0.0f; // reset time
+
+		//
+		// Compute normals using finite difference scheme.
+		//
+		for(UINT i = 1; i < mNumRows-1; ++i)
+		{
+			for(UINT j = 1; j < mNumCols-1; ++j)
+			{
+				float l = mCurrSolution[i*mNumCols+j-1].y;
+				float r = mCurrSolution[i*mNumCols+j+1].y;
+				float t = mCurrSolution[(i-1)*mNumCols+j].y;
+				float b = mCurrSolution[(i+1)*mNumCols+j].y;
+				mNormals[i*mNumCols+j].x = -r+l;
+				mNormals[i*mNumCols+j].y = 2.0f*mSpatialStep;
+				mNormals[i*mNumCols+j].z = b-t;
+
+				XMVECTOR n = XMVector3Normalize(XMLoadFloat3(&mNormals[i*mNumCols+j]));
+				XMStoreFloat3(&mNormals[i*mNumCols+j], n);
+
+				mTangentX[i*mNumCols+j] = XMFLOAT3(2.0f*mSpatialStep, r-l, 0.0f);
+				XMVECTOR T = XMVector3Normalize(XMLoadFloat3(&mTangentX[i*mNumCols+j]));
+				XMStoreFloat3(&mTangentX[i*mNumCols+j], T);
+			}
+		}
 	}
 }
 

@@ -14,14 +14,25 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Framework">
-      <UniqueIdentifier>{fbb37041-6a9b-4494-9cff-0b3d73f57bf8}</UniqueIdentifier>
+      <UniqueIdentifier>{33ada999-dd35-46fb-8292-529854c23f79}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="model.cpp">
+    <None Include="wave.psh">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="wave.vsh">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ch07-01-Light-Wave.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\d3d\d3dCamera.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\d3d\d3dGeometry.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\d3d\d3dShader.cpp">
@@ -30,25 +41,17 @@
     <ClCompile Include="..\..\include\d3d\d3dTimer.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="ch06-04-Model.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\include\d3d\d3dWave.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="hill.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\d3d\d3dUtil.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="model.vsh">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="model.psh">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="model.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\d3d\d3dApp.h">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -61,6 +64,9 @@
     <ClInclude Include="..\..\include\d3d\d3dFont.h">
       <Filter>Framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\d3d\d3dGeometry.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\d3d\d3dShader.h">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -69,6 +75,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\d3d\d3dUtil.h">
       <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\d3d\d3dWave.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\d3d\d3dLight.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="hill.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

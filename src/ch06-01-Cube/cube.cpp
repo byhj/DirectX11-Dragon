@@ -88,6 +88,7 @@ void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 
 void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 {
+	//Shader interface information
 	D3D11_INPUT_ELEMENT_DESC pInputLayoutDesc[2];
 	pInputLayoutDesc[0].SemanticName         = "POSITION";
 	pInputLayoutDesc[0].SemanticIndex        = 0;

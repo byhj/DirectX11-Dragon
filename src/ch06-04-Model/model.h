@@ -2,13 +2,13 @@
 #define CUBE_H
 
 #include <d3d11.h>
-#include <DirectXMath.h>
+#include <xnamath.h>
 #include <vector>
 
 #include "d3d/d3dDebug.h"
 #include "d3d/d3dShader.h"
 
-using namespace DirectX;
+
 
 class Model 
 {

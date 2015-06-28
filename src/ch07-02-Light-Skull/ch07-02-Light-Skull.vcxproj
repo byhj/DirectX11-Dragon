@@ -11,15 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A232EE81-A7D9-4369-9784-ABAE5A7D48B8}</ProjectGuid>
-    <RootNamespace>ch0601Cube</RootNamespace>
+    <ProjectGuid>{0A0BD7A7-5795-4AF2-BAF5-FB8EC1FA3F69}</ProjectGuid>
+    <RootNamespace>ch0702LightSkull</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -33,7 +33,6 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\DirectX11.0-Dragon.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -63,26 +62,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\include\d3d\d3dCamera.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dShader.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dTimer.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dUtil.cpp" />
-    <ClCompile Include="ch06-01-Cube.cpp" />
-    <ClCompile Include="cube.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\include\d3d\d3dApp.h" />
-    <ClInclude Include="..\..\include\d3d\d3dCamera.h" />
-    <ClInclude Include="..\..\include\d3d\d3dDebug.h" />
-    <ClInclude Include="..\..\include\d3d\d3dFont.h" />
-    <ClInclude Include="..\..\include\d3d\d3dShader.h" />
-    <ClInclude Include="..\..\include\d3d\d3dTimer.h" />
-    <ClInclude Include="..\..\include\d3d\d3dUtil.h" />
-    <ClInclude Include="cube.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cube.psh" />
-    <None Include="cube.vsh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

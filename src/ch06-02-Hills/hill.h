@@ -4,13 +4,13 @@
 #include <vector>
 
 #include <d3d11.h>
-#include <DirectXMath.h>
+#include <xnamath.h>
 
 #include "d3d/d3dDebug.h"
 #include "d3d/d3dShader.h"
 #include "d3d/d3dGeometry.h"
 
-using namespace DirectX;
+
 
 struct  Vertex
 {

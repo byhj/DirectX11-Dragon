@@ -1,6 +1,7 @@
 #ifndef D3DUTIL_H
 #define D3DUTIL_H
 
+#include <Windows.h>
 #include <xnamath.h>
 
 #define ARRAYSIZE(arr) sizeof(arr) / sizeof(arr[0])
@@ -18,18 +19,6 @@ namespace Colors
 	const XMFLOAT4 Silver    = XMFLOAT4(0.75f, 0.75f, 0.75f, 1.0f);
 	//const XMFLOAT4 LightSteelBlue = {0.69f, 0.77f, 0.87f, 1.0f};
 }
-
-//***************************************************************************************
-// MathHelper.h by Frank Luna (C) 2011 All Rights Reserved.
-//
-// Helper math class.
-//***************************************************************************************
-
-#ifndef MATHHELPER_H
-#define MATHHELPER_H
-
-#include <Windows.h>
-#include <xnamath.h>
 
 class MathHelper
 {
@@ -93,5 +82,4 @@ public:
 
 };
 
-#endif // MATHHELPER_H
 #endif

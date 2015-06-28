@@ -2,12 +2,12 @@
 
    This is a D3Dshader class, you can attach different shaders to class
    ShaderFormat:  
-                  VertexShader   : .vsh
-				  HullShader     : .hsh
-				  DomainShader   : .dsh
-				  GeometryShader : .gsh
-				  PixelShader    : .psh
-				  ComputeShader  : .csh
+                  VertexShader   : .vsh		Function: VS()
+				  HullShader     : .hsh		Function: HS()
+				  DomainShader   : .dsh		Function: DS()
+				  GeometryShader : .gsh		Function: GS()
+				  PixelShader    : .psh		Function: PS()
+				  ComputeShader  : .csh		Function: CS()
 
 	                                                          -----byhj  15/6/27
 *///////////////////////////////////////////////////////////////////////////////

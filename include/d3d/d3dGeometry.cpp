@@ -1,29 +1,5 @@
 #include "d3dGeometry.h"
-
-const float Pi = 3.1415926535f;
-
-float AngleFromXY(float x, float y)
-{
-	float theta = 0.0f;
-
-	// Quadrant I or IV
-	if(x >= 0.0f) 
-	{
-		// If x = 0, then atanf(y/x) = +pi/2 if y > 0
-		//                atanf(y/x) = -pi/2 if y < 0
-		theta = atanf(y / x); // in [-pi/2, +pi/2]
-
-		if(theta < 0.0f)
-			theta += 2.0f*Pi; // in [0, 2*pi).
-	}
-
-	// Quadrant II or III
-	else      
-		theta = atanf(y/x) + Pi; // in [0, 2*pi).
-
-	return theta;
-}
-
+#include "d3dUtil.h"
 
 void D3DGeometry::CreateCube(float width, float height, float depth, MeshData &mesh)
 {
@@ -403,7 +379,7 @@ void D3DGeometry::CreateGeosphere(float radius, UINT numSubdivisions, MeshData& 
 		XMStoreFloat3(&meshData.VertexData[i].Normal, n);
 
 		// Derive texture coordinates from spherical coordinates.
-		float theta = AngleFromXY( meshData.VertexData[i].Pos.x, meshData.VertexData[i].Pos.z);
+		float theta = MathHelper::AngleFromXY( meshData.VertexData[i].Pos.x, meshData.VertexData[i].Pos.z);
 
 		float phi = acosf(meshData.VertexData[i].Pos.y / radius);
 

@@ -11,6 +11,7 @@ class D3DFont
 public:
 	D3DFont() {};
 
+	//Set the font type you want
     void init(ID3D11Device *pD3D11Device, LPCWSTR fontType)
 	{
 		HRESULT hr = FW1CreateFactory(FW1_VERSION, &pFW1Factory);
@@ -19,6 +20,7 @@ public:
 		pFW1Factory->Release();
 	}
 
+	//Set the font text, position , color 
 	void drawText(ID3D11DeviceContext *pD3D11DeivceContext, WCHAR *text, 
 		          float fontSize, float posX, float posY, UINT fontCoor);
 

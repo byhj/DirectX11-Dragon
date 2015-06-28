@@ -2,12 +2,10 @@
 #define CUBE_H
 
 #include <d3d11.h>
-#include <DirectXMath.h>
+#include <xnamath.h>
 
 #include "d3d/d3dDebug.h"
 #include "d3d/d3dShader.h"
-
-using namespace DirectX;
 
 class Cube 
 {
@@ -26,6 +24,7 @@ public:
    void Render(ID3D11DeviceContext *pD3D11DeviceContext, XMMATRIX &model,  
 	           XMMATRIX &view, XMMATRIX &proj)
    {
+       //Update the the mvp matrix
 	   cbMatrix.model = XMMatrixTranspose(model);	
 	   cbMatrix.view  = XMMatrixTranspose(view);	
 	   cbMatrix.proj  = XMMatrixTranspose(proj);

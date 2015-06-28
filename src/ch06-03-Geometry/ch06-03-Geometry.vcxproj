@@ -67,6 +67,7 @@
     <ClCompile Include="..\..\include\d3d\d3dGeometry.cpp" />
     <ClCompile Include="..\..\include\d3d\d3dShader.cpp" />
     <ClCompile Include="..\..\include\d3d\d3dTimer.cpp" />
+    <ClCompile Include="..\..\include\d3d\d3dUtil.cpp" />
     <ClCompile Include="ch06-03-Geometry.cpp" />
     <ClCompile Include="geometry.cpp" />
   </ItemGroup>
