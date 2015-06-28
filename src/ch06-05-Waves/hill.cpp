@@ -44,7 +44,7 @@ void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 
 	D3D11_SUBRESOURCE_DATA VBO;
 	VBO.pSysMem = &m_VertexData[0];
-	hr = pD3D11Device->CreateBuffer(&vertexBufferDesc, &VBO, &m_pVertexBuffer);
+	hr = pD3D11Device->CreateBuffer(&vertexBufferDesc, &VBO, &m_pLandVB);
 	DebugHR(hr);
 
 	/////////////////////////////Index Buffer//////////////////////////////
@@ -60,10 +60,58 @@ void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 
 	D3D11_SUBRESOURCE_DATA IBO;
 	IBO.pSysMem = &gridMesh.IndexData[0];
-	hr = pD3D11Device->CreateBuffer(&indexBufferDesc, &IBO, &m_pIndexBuffer);
+	hr = pD3D11Device->CreateBuffer(&indexBufferDesc, &IBO, &m_pLandIB);
 	DebugHR(hr);
 
 	////////////////////////////////Const Buffer//////////////////////////////////////
+
+	wave.Init(200, 200, 0.8f, 0.03f, 3.25f, 0.4f);
+	D3D11_BUFFER_DESC vertexBufferDesc1;
+	vertexBufferDesc1.Usage               = D3D11_USAGE_DYNAMIC;
+	vertexBufferDesc1.ByteWidth           = sizeof(Vertex) * wave.VertexCount();
+	vertexBufferDesc1.BindFlags           = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc1.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
+	vertexBufferDesc1.MiscFlags           = 0;
+	vertexBufferDesc1.StructureByteStride = 0;
+
+	hr = pD3D11Device->CreateBuffer(&vertexBufferDesc1, NULL, &m_pWaveVB);
+	DebugHR(hr);
+
+	/////////////////////////////Index Buffer//////////////////////////////
+	std::vector<UINT> indices(3 * wave.TriangleCount() ); // 3 indices per face
+
+	// Iterate over each quad.
+	UINT m = wave.RowCount();
+	UINT n = wave.ColumnCount();
+	int k = 0;
+	for(UINT i = 0; i < m-1; ++i)
+	{
+		for(DWORD j = 0; j < n-1; ++j)
+		{
+			indices[k]   = i*n+j;
+			indices[k+1] = i*n+j+1;
+			indices[k+2] = (i+1)*n+j;
+
+			indices[k+3] = (i+1)*n+j;
+			indices[k+4] = i*n+j+1;
+			indices[k+5] = (i+1)*n+j+1;
+
+			k += 6; // next quad
+		}
+	}
+	D3D11_BUFFER_DESC indexBufferDesc1;
+	indexBufferDesc1.Usage               = D3D11_USAGE_IMMUTABLE;
+	indexBufferDesc1.ByteWidth           = sizeof(UINT) * indices.size();
+	indexBufferDesc1.BindFlags           = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc1.CPUAccessFlags      = 0;
+	indexBufferDesc1.MiscFlags           = 0;
+	indexBufferDesc1.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA IBO1;
+	IBO1.pSysMem = &indices[0];
+	hr = pD3D11Device->CreateBuffer(&indexBufferDesc1, &IBO1, &m_pWaveIB);
+	DebugHR(hr);
+
 
 	D3D11_BUFFER_DESC mvpDesc;	
 	ZeroMemory(&mvpDesc, sizeof(D3D11_BUFFER_DESC));
@@ -98,7 +146,7 @@ void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	unsigned numElements = ARRAYSIZE(pInputLayoutDesc);
 
 	CubeShader.init(pD3D11Device, hWnd);
-	CubeShader.attachVS(L"Hill.vsh", pInputLayoutDesc, numElements);
-	CubeShader.attachPS(L"Hill.psh");
+	CubeShader.attachVS(L"wave.vsh", pInputLayoutDesc, numElements);
+	CubeShader.attachPS(L"wave.psh");
 	CubeShader.end();
 }

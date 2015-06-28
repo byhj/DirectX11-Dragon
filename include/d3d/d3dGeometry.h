@@ -4,9 +4,8 @@
 #include <windows.h>
 #include <vector>
 #include <algorithm>
-#include <DirectXMath.h>
 
-using namespace DirectX;
+#include <xnamath.h>
 
 class D3DGeometry
 {

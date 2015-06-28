@@ -1,6 +1,7 @@
 
 #include "d3dShader.h"
 #include "d3dDebug.h"
+#include <D3DX11.h>
 
 void D3DShader::init(ID3D11Device *pD3D11Device, HWND hWnd)
 {

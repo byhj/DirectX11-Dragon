@@ -2,10 +2,8 @@
 #define D3DCAMERA_H
 
 #include <d3d11.h>
-#include <DirectXmath.h>
 #include <iostream>
-
-using namespace DirectX;
+#include <xnamath.h>
 
 const float Pi = 3.1415926535f;
 

@@ -16,8 +16,6 @@
 #define D3DSHADER_H
 
 #include <d3d11.h>
-#include <D3DX10math.h>
-#include <D3DX11async.h>
 #include <fstream>
 #include <iostream>
 #include <string>
