@@ -21,6 +21,7 @@ $RECYCLE.BIN/
 *.obj
 *.tlog
 *.pdb
+*.bmp
 *.exe
 *.idb
 *.log
@@ -31,6 +32,9 @@ $RECYCLE.BIN/
 *.jpg
 *.png
 *.DDS
+*.dds
+*.txt
+*.bmp
 # =========================
 # Operating System Files
 # =========================

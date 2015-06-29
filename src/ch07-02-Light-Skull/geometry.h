@@ -133,6 +133,7 @@ public:
 
     void init_buffer (ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext);
     void init_shader (ID3D11Device *pD3D11Device, HWND hWnd);
+	void init_light();
 
 private:
 	struct MatrixBuffer

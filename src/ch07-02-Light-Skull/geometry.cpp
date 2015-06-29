@@ -1,43 +1,24 @@
 #include "Geometry.h"
 #include "d3d/d3dUtil.h"
 
-void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
-{	
-	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mGridWorld, I);
 
-	XMMATRIX boxScale = XMMatrixScaling(3.0f, 1.0f, 3.0f);
-	XMMATRIX boxOffset = XMMatrixTranslation(0.0f, 0.5f, 0.0f);
-	XMStoreFloat4x4(&mBoxWorld, XMMatrixMultiply(boxScale, boxOffset));
-
-	XMMATRIX skullScale = XMMatrixScaling(0.5f, 0.5f, 0.5f);
-	XMMATRIX skullOffset = XMMatrixTranslation(0.0f, 1.0f, 0.0f);
-	XMStoreFloat4x4(&mSkullWorld, XMMatrixMultiply(skullScale, skullOffset));
-
-	for(int i = 0; i < 5; ++i)
-	{
-		XMStoreFloat4x4(&mCylWorld[i*2+0], XMMatrixTranslation(-5.0f, 1.5f, -10.0f + i*5.0f));
-		XMStoreFloat4x4(&mCylWorld[i*2+1], XMMatrixTranslation(+5.0f, 1.5f, -10.0f + i*5.0f));
-
-		XMStoreFloat4x4(&mSphereWorld[i*2+0], XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i*5.0f));
-		XMStoreFloat4x4(&mSphereWorld[i*2+1], XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i*5.0f));
-	}
-
+void Geometry::init_light()
+{
 	m_DirLights[0].Ambient   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	m_DirLights[0].Diffuse   = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_DirLights[0].Specular  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_DirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-	
+
 	m_DirLights[1].Ambient  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	m_DirLights[1].Diffuse  = XMFLOAT4(0.20f, 0.20f, 0.20f, 1.0f);
 	m_DirLights[1].Specular = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
 	m_DirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
-	
+
 	m_DirLights[2].Ambient  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	m_DirLights[2].Diffuse  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	m_DirLights[2].Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	m_DirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
-	
+
 	m_GridMat.Ambient  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	m_GridMat.Diffuse  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	m_GridMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
@@ -57,6 +38,32 @@ void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D
 	m_SkullMat.Ambient  = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	m_SkullMat.Diffuse  = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	m_SkullMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
+}
+
+
+void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
+{	
+	init_light();
+
+	XMMATRIX I = XMMatrixIdentity();
+	XMStoreFloat4x4(&mGridWorld, I);
+
+	XMMATRIX boxScale = XMMatrixScaling(3.0f, 1.0f, 3.0f);
+	XMMATRIX boxOffset = XMMatrixTranslation(0.0f, 0.5f, 0.0f);
+	XMStoreFloat4x4(&mBoxWorld, XMMatrixMultiply(boxScale, boxOffset));
+
+	XMMATRIX skullScale = XMMatrixScaling(0.5f, 0.5f, 0.5f);
+	XMMATRIX skullOffset = XMMatrixTranslation(0.0f, 1.0f, 0.0f);
+	XMStoreFloat4x4(&mSkullWorld, XMMatrixMultiply(skullScale, skullOffset));
+
+	for(int i = 0; i < 5; ++i)
+	{
+		XMStoreFloat4x4(&mCylWorld[i*2+0], XMMatrixTranslation(-5.0f, 1.5f, -10.0f + i*5.0f));
+		XMStoreFloat4x4(&mCylWorld[i*2+1], XMMatrixTranslation(+5.0f, 1.5f, -10.0f + i*5.0f));
+
+		XMStoreFloat4x4(&mSphereWorld[i*2+0], XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i*5.0f));
+		XMStoreFloat4x4(&mSphereWorld[i*2+1], XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i*5.0f));
+	}
 
 	HRESULT hr;
 	D3DGeometry::MeshData box;
@@ -251,6 +258,7 @@ void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D
 	hr = pD3D11Device->CreateBuffer(&matBufferDesc, NULL, &m_pMaterialBuffer);
 	DebugHR(hr);
 }
+
 
 void Geometry::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 {
