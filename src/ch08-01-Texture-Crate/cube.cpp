@@ -1,8 +1,52 @@
 #include "cube.h"
 #include "d3d/d3dUtil.h"
 
+namespace byhj
+{
 
-void Geometry::init_light()
+void Cube::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
+{
+	init_buffer(pD3D11Device, pD3D11DeviceContext);
+	init_shader(pD3D11Device, hWnd);
+	init_texture(pD3D11Device);
+}
+
+void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix, D3DCamera *camera)
+{
+
+		// Set vertex buffer stride and offset
+		unsigned int stride;
+		unsigned int offset;
+		stride = sizeof(Vertex);
+		offset = 0;
+		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pCubeVB, &stride, &offset);
+		pD3D11DeviceContext->IASetIndexBuffer(m_pCubeIB, DXGI_FORMAT_R32_UINT, 0);
+
+		/////Matrix
+		cbMatrix.model = matrix.model;
+		cbMatrix.view  = matrix.view;
+		cbMatrix.proj  = matrix.proj;
+		pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+
+		////Light
+		cbLight.g_DirLights[0]   = m_DirLights[0];
+		cbLight.g_DirLights[1]   = m_DirLights[1];
+		cbLight.g_EyePos     = camera->GetPos();
+		pD3D11DeviceContext->UpdateSubresource(m_pLightBuffer, 0, NULL, &cbLight, 0, 0);
+		pD3D11DeviceContext->PSSetConstantBuffers(0, 1, &m_pLightBuffer);
+
+		CubeShader.use(pD3D11DeviceContext);
+
+		//Material
+		cbMaterial = m_CubeMat;
+		pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+		pD3D11DeviceContext->PSSetConstantBuffers(1, 1, &m_pMaterialBuffer);
+		pD3D11DeviceContext->PSSetShaderResources(0, 1, &m_pDiffuseTexSRV);
+		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+}
+
+void Cube::init_light()
 {
 	m_DirLights[0].Ambient  = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
 	m_DirLights[0].Diffuse  = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
@@ -20,7 +64,7 @@ void Geometry::init_light()
 }
 
 
-void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
+void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
 {	
 	init_light();
 
@@ -102,14 +146,14 @@ void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D
 	DebugHR(hr);
 }
 
-void Geometry::init_texture(ID3D11Device *pD3D11Device)
+void Cube::init_texture(ID3D11Device *pD3D11Device)
 {
 	HRESULT hr;
 	hr = D3DX11CreateShaderResourceViewFromFile(pD3D11Device, L"../../media/textures/WoodCrate01.dds", 0, 0, &m_pDiffuseTexSRV, 0 );
 	DebugHR(hr);
 }
 
-void Geometry::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
+void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 {
 	D3D11_INPUT_ELEMENT_DESC pInputLayoutDesc[3];
 	pInputLayoutDesc[0].SemanticName         = "POSITION";
@@ -142,4 +186,7 @@ void Geometry::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	CubeShader.attachVS(L"model.vsh", pInputLayoutDesc, numElements);
 	CubeShader.attachPS(L"model.psh");
 	CubeShader.end();
+}
+
+
 }

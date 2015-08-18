@@ -1,6 +1,122 @@
 #include "Hill.h"
 #include "d3d/d3dUtil.h"
 
+namespace byhj
+{
+void Hill::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
+{
+	init_buffer(pD3D11Device, pD3D11DeviceContext);
+	init_shader(pD3D11Device, hWnd);
+	init_texture(pD3D11Device);
+}
+
+void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const XMFLOAT4X4 &model,
+		const XMFLOAT4X4 &view, const XMFLOAT4X4 &proj, D3DTimer *timer, D3DCamera *camera)
+{
+
+		// Every quarter second, generate a random wave.
+
+		static float t_base = 0.0f;
+		if ((timer->GetTotalTime() - t_base) >= 0.25f)
+		{
+			t_base += 0.25f;
+
+			DWORD i = 5 + rand() % (wave.RowCount() - 10);
+			DWORD j = 5 + rand() % (wave.ColumnCount() - 10);
+
+			float r = MathHelper::RandF(1.0f, 2.0f);
+			wave.Disturb(i, j, r);
+		}
+		wave.Update(timer->GetDeltaTime());
+
+		D3D11_MAPPED_SUBRESOURCE mappedData;
+		pD3D11DeviceContext->Map(m_pWaveVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData);
+
+		Vertex* v = reinterpret_cast<Vertex*>(mappedData.pData);
+		for (UINT i = 0; i < wave.VertexCount(); ++i)
+		{
+			v[i].Pos = wave[i];
+			v[i].Normal = wave.Normal(i);
+
+			// Derive tex-coords in [0,1] from position.
+			v[i].Tex.x  = 0.5f + wave[i].x / wave.Width();
+			v[i].Tex.y  = 0.5f - wave[i].z / wave.Depth();
+		}
+		pD3D11DeviceContext->Unmap(m_pWaveVB, 0);
+
+		/////////////////////////////Update Light and Matrix//////////////////////////////////
+		XMFLOAT3 camPos = camera->GetPos();
+
+		// Circle light over the land surface.
+		m_PointLight.Position.x = 70.0f*cosf(0.2f*timer->GetTotalTime());
+		m_PointLight.Position.z = 70.0f*sinf(0.2f*timer->GetTotalTime());
+		m_PointLight.Position.y = MathHelper::Max(GetHillHeight(m_PointLight.Position.x,
+			m_PointLight.Position.z), -3.0f) + 10.0f;
+		m_SpotLight.Position = camPos;
+		XMVECTOR pos = XMVectorSet(camPos.x, camPos.y, camPos.z, 1.0f);
+		XMStoreFloat3(&m_SpotLight.Direction, XMVector3Normalize(-pos));
+
+
+		cbLight.g_DirLight   = m_DirLight;
+		cbLight.g_PointLight = m_PointLight;
+		cbLight.g_SpotLight  = m_SpotLight;
+		cbLight.g_EyePos     = camPos;
+		pD3D11DeviceContext->UpdateSubresource(m_pLightBuffer, 0, NULL, &cbLight, 0, 0);
+		pD3D11DeviceContext->PSSetConstantBuffers(0, 1, &m_pLightBuffer);
+
+		cbMatrix.model = model;
+		cbMatrix.view  = view;
+		cbMatrix.proj  = proj;
+
+	//	XMVECTOR matInvDeter;
+	//	XMMATRIX modelInv = XMMatrixInverse(&matInvDeter, model);
+	//	XMMATRIX modelInvTranspose = XMMatrixTranspose(modelInv);
+
+		// Set vertex buffer stride and offset
+		unsigned int stride;
+		unsigned int offset;
+		stride = sizeof(Vertex);
+		offset = 0;
+
+		////////////////////////// Land  //////////////////////////////
+
+		XMMATRIX grassTexScale = XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		XMStoreFloat4x4(&cbMatrix.texTrans ,  XMMatrixTranspose(grassTexScale) );
+		pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+
+		cbMaterial  = m_LandMat;
+		pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+		pD3D11DeviceContext->PSSetConstantBuffers(1, 1, &m_pMaterialBuffer);
+		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pLandVB, &stride, &offset);
+		pD3D11DeviceContext->IASetIndexBuffer(m_pLandIB, DXGI_FORMAT_R32_UINT, 0);
+		pD3D11DeviceContext->PSSetShaderResources(0, 1, &m_pHillTexSRV);
+		CubeShader.use(pD3D11DeviceContext);
+		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+
+
+		////////////////////////// Wave //////////////////////////////
+		// Animate water texture coordinates.
+		// Tile water texture.
+		static XMFLOAT2 m_WaterTexOffset = XMFLOAT2(0.0f, 0.0f);
+		// Translate texture over time.
+		m_WaterTexOffset.y += 0.05f * timer->GetDeltaTime();
+		m_WaterTexOffset.x += 0.1f * timer->GetDeltaTime();
+		XMMATRIX wavesOffset = XMMatrixTranslation(sinf(m_WaterTexOffset.x), sinf(m_WaterTexOffset.y), 0.0f);
+		XMStoreFloat4x4(&cbMatrix.texTrans, XMMatrixTranspose(wavesOffset) );
+		pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+
+		cbMaterial = m_WavesMat;
+		pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+		pD3D11DeviceContext->PSSetConstantBuffers(1, 1, &m_pMaterialBuffer);
+		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pWaveVB, &stride, &offset);
+		pD3D11DeviceContext->IASetIndexBuffer(m_pWaveIB, DXGI_FORMAT_R32_UINT, 0);
+		pD3D11DeviceContext->PSSetShaderResources(0, 1, &m_pWaveTexSRV);
+		CubeShader.use(pD3D11DeviceContext);
+		pD3D11DeviceContext->DrawIndexed(3 * wave.TriangleCount(), 0, 0);
+}
+
 float Hill::GetHillHeight(float x, float z) const
 {
 	return 0.3f * ( z*sinf(0.1f * x) + x*cosf(0.1f * z) );
@@ -233,4 +349,6 @@ void Hill::init_texture(ID3D11Device *pD3D11Device)
 	DebugHR(hr);
 	hr = D3DX11CreateShaderResourceViewFromFile(pD3D11Device, L"../../media/textures/water2.dds", 0, 0, &m_pWaveTexSRV, 0 );
 	DebugHR(hr);
+}
+
 }
