@@ -1,6 +1,109 @@
 #include "Geometry.h"
 #include "d3d/d3dUtil.h"
 
+namespace byhj
+{
+
+
+void Geometry::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
+{
+	init_buffer(pD3D11Device, pD3D11DeviceContext);
+	init_shader(pD3D11Device, hWnd);
+}
+
+void Geometry::Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix, D3DCamera *camera)
+{
+		//
+	// Switch the number of lights based on key presses.
+	//
+	if (GetAsyncKeyState('0') & 0x8000)
+		mLightCount = 0;
+
+	if (GetAsyncKeyState('1') & 0x8000)
+		mLightCount = 1;
+
+	if (GetAsyncKeyState('2') & 0x8000)
+		mLightCount = 2;
+
+	if (GetAsyncKeyState('3') & 0x8000)
+		mLightCount = 3;
+
+	XMMATRIX world;
+	world = XMLoadFloat4x4(&mSkullWorld);
+	cbMatrix.model = matrix.model;
+	cbMatrix.view  = matrix.view;
+	cbMatrix.proj  = matrix.proj;
+	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+
+	cbLight.g_DirLight   = m_DirLights[mLightCount];
+	cbLight.g_EyePos     = camera->GetPos();
+	pD3D11DeviceContext->UpdateSubresource(m_pLightBuffer, 0, NULL, &cbLight, 0, 0);
+	pD3D11DeviceContext->PSSetConstantBuffers(0, 1, &m_pLightBuffer);
+
+	CubeShader.use(pD3D11DeviceContext);
+	// Set vertex buffer stride and offset
+	unsigned int stride;
+	unsigned int offset;
+	stride = sizeof(Vertex);
+	offset = 0;
+	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pSkullVB, &stride, &offset);
+	pD3D11DeviceContext->IASetIndexBuffer(m_pSkullIB, DXGI_FORMAT_R32_UINT, 0);
+	cbMaterial = m_SkullMat;
+	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+	pD3D11DeviceContext->PSSetConstantBuffers(1, 1, &m_pMaterialBuffer);
+	pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+
+
+	//////////////////////////////Draw the Shade//////////////////////////
+	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pShapesVB, &stride, &offset);
+	pD3D11DeviceContext->IASetIndexBuffer(m_pShapesIB, DXGI_FORMAT_R32_UINT, 0);
+
+	// Draw the grid.
+	world = XMLoadFloat4x4(&mGridWorld);
+	XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world) );
+	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+	cbMaterial = m_GridMat;
+	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+	pD3D11DeviceContext->DrawIndexed(mGridIndexCount, mGridIndexOffset, mGridVertexOffset);
+
+	// Draw the box.
+	world = XMLoadFloat4x4(&mBoxWorld);
+	XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+	cbMaterial = m_BoxMat;
+	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+	pD3D11DeviceContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
+
+
+	// Draw the cylinders.
+	cbMaterial = m_CylinderMat;
+	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+	for (int i = 0; i < 10; ++i)
+	{
+		world = XMLoadFloat4x4(&mCylWorld[i]);
+	    XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world) );
+		pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+		pD3D11DeviceContext->DrawIndexed(mCylinderIndexCount, mCylinderIndexOffset, mCylinderVertexOffset);
+	}
+
+	// Draw the spheres.
+	cbMaterial = m_SphereMat;
+	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
+	for (int i = 0; i < 10; ++i)
+	{
+		world = XMLoadFloat4x4(&mSphereWorld[i]);
+		XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+		pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+		pD3D11DeviceContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
+	}
+
+}
+
 
 void Geometry::init_light()
 {
@@ -285,4 +388,7 @@ void Geometry::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	CubeShader.attachVS(L"model.vsh", pInputLayoutDesc, numElements);
 	CubeShader.attachPS(L"model.psh");
 	CubeShader.end();
+}
+
+
 }
