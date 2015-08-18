@@ -9,12 +9,11 @@
 #include "d3d/d3dDebug.h"
 #include "d3d/d3dShader.h"
 #include "d3d/d3dGeometry.h"
+#include "d3d/d3dUtility.h"
 
-struct  Vertex
+namespace byhj
 {
-	XMFLOAT3 Pos;
-	XMFLOAT3 Normal;
-};
+
 
 class Geometry
 {
@@ -30,12 +29,12 @@ public:
    }
    ~Geometry() {}
 
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, XMMATRIX &model,  
-	           XMMATRIX &view, XMMATRIX &proj)
+   void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix)
    {
-	   cbMatrix.model = XMMatrixTranspose(model);	
-	   cbMatrix.view  = XMMatrixTranspose(view);	
-	   cbMatrix.proj  = XMMatrixTranspose(proj);
+	   cbMatrix.model = matrix.model;	
+	   cbMatrix.view  = matrix.view;	
+	   cbMatrix.proj  = matrix.proj;
 
 	   // Set vertex buffer stride and offset
 	   unsigned int stride;
@@ -56,14 +55,14 @@ public:
 	   // Draw the box.
 	   XMMATRIX world ;
 	   world = XMLoadFloat4x4(&mBoxWorld);
-	   cbMatrix.model = XMMatrixTranspose(world);	
+	   XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world) );	
 	   pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0 );
 	   pD3D11DeviceContext->VSSetConstantBuffers( 0, 1, &m_pMVPBuffer);
 	   pD3D11DeviceContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
 
 	   // Draw center sphere.
 	   world = XMLoadFloat4x4(&mCenterSphere);
-	   cbMatrix.model = XMMatrixTranspose(world);	
+	   XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
 	   pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0 );
 	   pD3D11DeviceContext->VSSetConstantBuffers( 0, 1, &m_pMVPBuffer);
 	   pD3D11DeviceContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
@@ -72,7 +71,7 @@ public:
 	   for(int i = 0; i < 10; ++i)
 	   {
 		   world = XMLoadFloat4x4(&mCylWorld[i]);
-		   cbMatrix.model = XMMatrixTranspose(world);	
+		   XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
 		   pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0 );
 		   pD3D11DeviceContext->VSSetConstantBuffers( 0, 1, &m_pMVPBuffer);
 		   pD3D11DeviceContext->DrawIndexed(mCylinderIndexCount, mCylinderIndexOffset, mCylinderVertexOffset);
@@ -82,7 +81,7 @@ public:
 	   for(int i = 0; i < 10; ++i)
 	   {
 		   world = XMLoadFloat4x4(&mSphereWorld[i]);
-		   cbMatrix.model = XMMatrixTranspose(world);	
+		   XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
 		   pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0 );
 		   pD3D11DeviceContext->VSSetConstantBuffers( 0, 1, &m_pMVPBuffer);
 		   pD3D11DeviceContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
@@ -102,15 +101,15 @@ public:
     void init_shader (ID3D11Device *pD3D11Device, HWND hWnd);
 
 private:
-	struct MatrixBuffer
+	struct  Vertex
 	{
-		XMMATRIX  model;
-		XMMATRIX  view;
-		XMMATRIX  proj;
+		XMFLOAT3 Pos;
+		XMFLOAT3 Normal;
 	};
-	MatrixBuffer cbMatrix;
 
-	D3DShader CubeShader;
+	byhj::MatrixBuffer cbMatrix;
+	byhj::Shader CubeShader;
+
 	ID3D11Buffer        *m_pVertexBuffer;
 	ID3D11Buffer        *m_pIndexBuffer;
 	ID3D11Buffer        *m_pMVPBuffer;
@@ -145,4 +144,6 @@ private:
 	XMFLOAT4X4 mCenterSphere;
 };
 
+
+}
 #endif

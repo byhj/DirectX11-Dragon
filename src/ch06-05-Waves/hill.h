@@ -10,13 +10,12 @@
 #include "d3d/d3dGeometry.h"
 #include "d3d/d3dWave.h"
 #include "d3d/d3dTimer.h"
+#include "d3d/d3dUtility.h"
 #include "d3d/d3dUtil.h"
 
-struct  Vertex
+namespace byhj
 {
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
-};
+
 
 class Hill 
 {
@@ -30,8 +29,8 @@ public:
    }
    ~Hill() {}
 
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, XMMATRIX &model,  
-	           XMMATRIX &view, XMMATRIX &proj, D3DTimer *timer)
+   void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix, D3DTimer *timer)
    {
 
 	   // Every quarter second, generate a random wave.
@@ -64,9 +63,9 @@ public:
 
 	   pD3D11DeviceContext->Unmap(m_pWaveVB, 0);
 
-	   cbMatrix.model = XMMatrixTranspose(model);	
-	   cbMatrix.view  = XMMatrixTranspose(view);	
-	   cbMatrix.proj  = XMMatrixTranspose(proj);
+	   cbMatrix.model = matrix.model;	
+	   cbMatrix.view  = matrix.view;	
+	   cbMatrix.proj  = matrix.proj;
 	   pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0 );
 	   pD3D11DeviceContext->VSSetConstantBuffers( 0, 1, &m_pMVPBuffer);
 
@@ -98,15 +97,15 @@ public:
 	float GetHeight(float x, float z) const;
 
 private:
-	struct MatrixBuffer
+	struct  Vertex
 	{
-		XMMATRIX  model;
-		XMMATRIX  view;
-		XMMATRIX  proj;
+		XMFLOAT3 Pos;
+		XMFLOAT4 Color;
 	};
-	MatrixBuffer cbMatrix;
 
-	D3DShader CubeShader;
+	byhj::MatrixBuffer cbMatrix;
+
+	byhj::Shader CubeShader;
 	ID3D11Buffer        *m_pLandVB;
 	ID3D11Buffer        *m_pLandIB;
 	ID3D11Buffer        *m_pWaveVB;
@@ -124,4 +123,5 @@ private:
 	D3DWave     wave;
 };
 
+}
 #endif

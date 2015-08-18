@@ -14,14 +14,29 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Framework">
-      <UniqueIdentifier>{fbb37041-6a9b-4494-9cff-0b3d73f57bf8}</UniqueIdentifier>
+      <UniqueIdentifier>{eb8e0eaf-fd01-4af2-a1f1-77832c4bd951}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ch06-04-Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
     <ClCompile Include="model.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\d3d\d3dGeometry.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\d3d\d3dApp.cpp">
+      <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\d3d\d3dCamera.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\d3d\d3dFont.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\d3d\d3dShader.cpp">
@@ -30,8 +45,8 @@
     <ClCompile Include="..\..\include\d3d\d3dTimer.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="ch06-04-Model.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\include\d3d\d3dUtility.cpp">
+      <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\d3d\d3dUtil.cpp">
       <Filter>Framework</Filter>
@@ -46,8 +61,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="model.h">
-      <Filter>Resource Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\d3d\d3dGeometry.h">
+      <Filter>Framework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\d3d\d3dApp.h">
       <Filter>Framework</Filter>
@@ -65,6 +86,9 @@
       <Filter>Framework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\d3d\d3dTimer.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\d3d\d3dUtility.h">
       <Filter>Framework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\d3d\d3dUtil.h">

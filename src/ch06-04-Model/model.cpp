@@ -2,6 +2,15 @@
 #include "d3d/d3dUtil.h"
 #include <fstream>
 
+namespace byhj
+{
+
+void Model::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
+{
+	init_buffer(pD3D11Device, pD3D11DeviceContext);
+	init_shader(pD3D11Device, hWnd);
+}
+
 void Model::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
 {
 	HRESULT hr;
@@ -104,4 +113,7 @@ void Model::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	CubeShader.attachVS(L"Model.vsh", pInputLayoutDesc, numElements);
 	CubeShader.attachPS(L"Model.psh");
 	CubeShader.end();
+}
+
+
 }

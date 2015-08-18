@@ -1,9 +1,19 @@
 #include "Hill.h"
 #include "d3d/d3dUtil.h"
 
+namespace byhj
+{
+
+
 float Hill::GetHeight(float x, float z) const
 {
 	return 0.3f * ( z*sinf(0.1f * x) + x*cosf(0.1f * z) );
+}
+
+void Hill::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
+{
+	init_buffer(pD3D11Device, pD3D11DeviceContext);
+	init_shader(pD3D11Device, hWnd);
 }
 
 void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
@@ -149,4 +159,6 @@ void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	CubeShader.attachVS(L"wave.vsh", pInputLayoutDesc, numElements);
 	CubeShader.attachPS(L"wave.psh");
 	CubeShader.end();
+}
+
 }

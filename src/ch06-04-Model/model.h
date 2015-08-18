@@ -7,7 +7,10 @@
 
 #include "d3d/d3dDebug.h"
 #include "d3d/d3dShader.h"
+#include "d3d/d3dUtility.h"
 
+namespace byhj
+{
 
 
 class Model 
@@ -23,13 +26,12 @@ public:
 	  m_IndexCount    = 0;
    }
    ~Model() {}
-
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, XMMATRIX &model,  
-	           XMMATRIX &view, XMMATRIX &proj)
+   void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix)
    {
-	   cbMatrix.model = XMMatrixTranspose(model);	
-	   cbMatrix.view  = XMMatrixTranspose(view);	
-	   cbMatrix.proj  = XMMatrixTranspose(proj);
+	   cbMatrix.model = matrix.model;	
+	   cbMatrix.view  = matrix.view;	
+	   cbMatrix.proj  = matrix.proj;
 	   pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0 );
 	   pD3D11DeviceContext->VSSetConstantBuffers( 0, 1, &m_pMVPBuffer);
 
@@ -58,22 +60,14 @@ public:
     void init_shader (ID3D11Device *pD3D11Device, HWND hWnd);
 
 private:
-	struct MatrixBuffer
-	{
-		XMMATRIX  model;
-		XMMATRIX  view;
-		XMMATRIX  proj;
-
-	};
-	MatrixBuffer cbMatrix;
 
 	struct  Vertex
 	{
 		XMFLOAT3 Pos;
 		XMFLOAT3 Normal;
 	};
-
-	D3DShader CubeShader;
+	byhj::MatrixBuffer cbMatrix;
+	byhj::Shader CubeShader;
 	ID3D11Buffer        *m_pVertexBuffer;
 	ID3D11Buffer        *m_pIndexBuffer;
 	ID3D11Buffer        *m_pMVPBuffer;
@@ -86,4 +80,5 @@ private:
 	int m_IndexCount;
 };
 
+}
 #endif
