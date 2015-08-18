@@ -1,6 +1,16 @@
 #include "d3dCamera.h"
 
 
+namespace byhj
+{
+
+
+float Clamp(const float& x, const float& low, const float& high)
+{
+	return x < low ? low : (x > high ? high : x); 
+}
+
+
 void D3DCamera::update()
 {
 	// Convert Spherical to Cartesian coordinates.
@@ -16,13 +26,19 @@ void D3DCamera::update()
 	XMStoreFloat3(&this->pos, pos);
 	XMStoreFloat3(&this->target, target);
 
-	m_View = XMMatrixLookAtLH(pos, target, up);
-	m_Proj  = XMMatrixPerspectiveFovLH(XMConvertToRadians(zoom), aspect, 1.0f, 1000.0f);
+	XMMATRIX View = XMMatrixLookAtLH(pos, target, up);
+	XMMATRIX Proj  = XMMatrixPerspectiveFovLH( XMConvertToRadians(45.0f), m_aspect, 1.0f, 1000.0f);
+
+	XMStoreFloat4x4(&m_View, XMMatrixTranspose(View) );
+	XMStoreFloat4x4(&m_Proj, XMMatrixTranspose(Proj) );
 }
 
 void D3DCamera::OnMouseWheel(WPARAM btnState, int x, int y, float aspect)
 {
+	static float zoom = 45.0f;
 	zoom += x * 0.01f;
+	XMMATRIX Proj  = XMMatrixPerspectiveFovLH( XMConvertToRadians(45.0f), aspect, 1.0f, 1000.0f);
+	XMStoreFloat4x4(&m_Proj, XMMatrixTranspose(Proj) );
 }
 
 void D3DCamera::OnMouseDown(WPARAM btnState, int x, int y, HWND hWnd)
@@ -51,9 +67,9 @@ void D3DCamera::OnMouseMove(WPARAM btnState, int x, int y)
 		m_Phi   += dy;
 
 		// Restrict the angle mPhi.
-		m_Phi = MathHelper::Clamp(m_Phi, 0.1f, MathHelper::Pi-0.1f);
+		m_Phi = Clamp(m_Phi, 0.1f, Pi-0.1f);
 	}
-	/*
+
 	else if( (btnState & MK_RBUTTON) != 0 )
 	{
 		// Make each pixel correspond to 0.005 unit in the scene.
@@ -66,8 +82,10 @@ void D3DCamera::OnMouseMove(WPARAM btnState, int x, int y)
 		// Restrict the radius.
 		m_Radius = Clamp(m_Radius, 3.0f, 15.0f);
 	}
-	*/
+
 	m_LastMousePos.x = x;
 	m_LastMousePos.y = y;
 }
 
+
+}

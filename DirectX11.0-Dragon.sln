@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ch00-Window", "src\ch00-Window\ch00-Window.vcxproj", "{E4118C63-D6DC-4C26-8A92-6911C852F288}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chapter00", "Chapter00", "{DD607913-EA30-4855-9029-39433025EE3F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ch01-InitD3D", "src\ch01-InitD3D\ch01-InitD3D.vcxproj", "{8BCF4120-BC56-42AD-91AA-6311BA0139E0}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Framework", "src\Framework\Framework.vcxproj", "{03A71C25-1795-49EB-95E7-9D6EE750991B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chapter06", "Chapter06", "{2075220E-46FD-4B7D-BF89-1CF20F1FEAB2}"
 EndProject
@@ -67,16 +67,6 @@ Global
 		{8BCF4120-BC56-42AD-91AA-6311BA0139E0}.Release|Win32.Build.0 = Release|Win32
 		{8BCF4120-BC56-42AD-91AA-6311BA0139E0}.Release|x64.ActiveCfg = Release|x64
 		{8BCF4120-BC56-42AD-91AA-6311BA0139E0}.Release|x64.Build.0 = Release|x64
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Debug|Win32.Build.0 = Debug|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Debug|x64.ActiveCfg = Debug|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Release|Win32.ActiveCfg = Release|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Release|Win32.Build.0 = Release|Win32
-		{03A71C25-1795-49EB-95E7-9D6EE750991B}.Release|x64.ActiveCfg = Release|Win32
 		{A232EE81-A7D9-4369-9784-ABAE5A7D48B8}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{A232EE81-A7D9-4369-9784-ABAE5A7D48B8}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{A232EE81-A7D9-4369-9784-ABAE5A7D48B8}.Debug|Win32.ActiveCfg = Debug|Win32

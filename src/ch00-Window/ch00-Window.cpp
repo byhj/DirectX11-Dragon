@@ -1,16 +1,10 @@
-#include "d3d/d3dApp.h"
+#include "RenderSystem.h"
+#include <memory>
 
-class WindowApp: public D3DApp
-{
-public:
-	WindowApp() 
-	{
-		m_AppName = L"Window";
-	}
-	~WindowApp() {}
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow) 
+{                                                     
+	auto app = std::make_shared<byhj::RenderSystem>();
+	app->Run();       
 
-private:
-
-};
-
-CALL_MAIN(WindowApp);
+	return 0;                                           
+}

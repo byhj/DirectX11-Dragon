@@ -1,47 +1,35 @@
 #ifndef D3DFONT_H
 #define D3DFONT_H
 
-#include "d3dDebug.h"
-
 #include <FW1FontWrapper.h>
 #pragma  comment(lib, "FW1FontWrapper.lib")
+
+#include "d3dDebug.h"
+
+namespace byhj
+{
 
 class D3DFont
 {
 public:
-	D3DFont() {};
+	D3DFont(): m_pFW1Factory(NULL), m_pFontWrapper(NULL) {}
 
-	//Set the font type you want
-    void init(ID3D11Device *pD3D11Device, LPCWSTR fontType)
+    void init(ID3D11Device *pD3D11Device)
 	{
-		HRESULT hr = FW1CreateFactory(FW1_VERSION, &pFW1Factory);
-		hr = pFW1Factory->CreateFontWrapper(pD3D11Device, fontType, &pFontWrapper);
+		HRESULT hr = FW1CreateFactory(FW1_VERSION, &m_pFW1Factory);
+		hr = m_pFW1Factory->CreateFontWrapper(pD3D11Device, L"Arial", &m_pFontWrapper);
 		DebugHR(hr);
-		pFW1Factory->Release();
+		m_pFW1Factory->Release();
 	}
+	void drawText(ID3D11DeviceContext *pD3D11DeivceContext, const WCHAR *text, 
+		          float fontSize, float posX, float posY);
 
-	//Set the font text, position , color 
-	void drawText(ID3D11DeviceContext *pD3D11DeivceContext, WCHAR *text, 
-		          float fontSize, float posX, float posY, UINT fontCoor);
+	void drawFps(ID3D11DeviceContext *pD3D11DeviceContext, UINT fps);
 
 private:
-	IFW1Factory *pFW1Factory;
-	IFW1FontWrapper *pFontWrapper;
+	IFW1Factory     *m_pFW1Factory;
+	IFW1FontWrapper *m_pFontWrapper;
 };
 
-void D3DFont::drawText(ID3D11DeviceContext *pD3D11DeivceContext, WCHAR *text, 
-					float fontSize, float posX, float posY, UINT fontColor)
-{
-
-	pFontWrapper->DrawString(
-		pD3D11DeivceContext,
-		text,// String
-		fontSize,// D3DFont size
-		posX,// X position
-		posY,// Y position
-		fontColor,// Text color, 0xAaBbGgRr
-		FW1_RESTORESTATE// Flags (for example FW1_RESTORESTATE to keep context states unchanged)
-		);
 }
-
 #endif

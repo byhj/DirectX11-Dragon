@@ -30,7 +30,6 @@ VS_OUT VS( VS_IN vs_in)
    vs_out.Pos = mul(vs_in.Pos,  model);
    vs_out.Pos = mul(vs_out.Pos, view);
    vs_out.Pos = mul(vs_out.Pos, proj);
-
    vs_out.Tex      = mul(float4(vs_in.Tex, 0.0f, 1.0f), texTrans).xy;
    vs_out.WorldPos = mul(vs_in.Pos, model).xyz;
    vs_out.Normal   = mul(vs_in.Normal, (float3x3)model );

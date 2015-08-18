@@ -6,32 +6,34 @@
 #endif 
 
 #include <d3d11.h>
-#include <iostream>
 #include <xnamath.h>
+#include <D3DX10math.h>
+#include <vector>
 
-#include "d3d/d3dUtil.h"
+namespace byhj
+{
+
+const float Pi = 3.1415926535f;
 
 class D3DCamera
 {
 public:
-	D3DCamera():m_Theta(1.5f * MathHelper::Pi), m_Phi(0.25f * MathHelper::Pi), m_Radius(5.0f)
+    D3DCamera():m_Theta(1.5f * Pi), m_Phi(0.25f * Pi), m_Radius(15.0f)
 	{
 		m_LastMousePos.x = 0;
 		m_LastMousePos.y = 0;
 		XMMATRIX I = XMMatrixIdentity();
-		m_World = I;
-		m_View  = I;
-		m_Proj  = I;
-		aspect  = 1.0f;
-		zoom = 45.0f;
+		XMStoreFloat4x4(&m_World,  I);
+		XMStoreFloat4x4(&m_View ,  I);
+		XMStoreFloat4x4(&m_Proj ,  I);
 	}
 
 	void update();
-	XMMATRIX GetViewMatrix() const 
+	XMFLOAT4X4 GetViewMatrix() const 
 	{
 		return m_View;
 	}
-	XMMATRIX GetProjMatrix() const
+    XMFLOAT4X4 GetProjMatrix() const
 	{
 		return m_Proj;
 	}
@@ -39,12 +41,10 @@ public:
 	{
 		return pos;
 	}
-	void Init(float r, float asp)
+	void SetRadius(float r)
 	{
 		m_Radius = r;
-		aspect  =  asp;
 	}
-
 	void OnMouseDown(WPARAM btnState, int x, int y, HWND hWnd);
 	void OnMouseMove(WPARAM btnState, int x, int y);
 	void OnMouseUp(WPARAM btnState, int x, int y);
@@ -57,13 +57,15 @@ private:
 	float m_Radius;
 	POINT m_LastMousePos;
 
-	XMMATRIX m_World;
-	XMMATRIX m_View;
-	XMMATRIX m_Proj;
+	XMFLOAT4X4 m_World;
+	XMFLOAT4X4 m_View;
+	XMFLOAT4X4 m_Proj;
 	XMFLOAT3 pos;
 	XMFLOAT3 target;
-	float aspect;
-	float zoom;
+	float m_aspect;
 };
+
+
+}
 
 #endif

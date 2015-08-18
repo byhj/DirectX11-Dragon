@@ -1,8 +1,12 @@
 #include "d3dTimer.h"
 
-D3DTimer::D3DTimer():
-	m_SecondsPerCount(0.0),
-	m_DeltaTime(-1.0), 
+namespace byhj
+{
+
+
+
+D3DTimer::D3DTimer(): m_SecondsPerCount(0.0),
+	m_DeltaTime(0.0), 
 	m_BaseTime(0), 
 	m_PausedTime(0),
 	m_PrevTime(0),
@@ -123,4 +127,7 @@ void D3DTimer::Count()
 	{
 		m_DeltaTime = 0.0;
 	}
+}
+
+
 }
