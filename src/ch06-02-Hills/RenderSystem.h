@@ -7,7 +7,7 @@
 #include "d3d/d3dCamera.h"
 #include "d3d/d3dUtility.h"
 
-#include "Cube.h"
+#include "Hill.h"
 
 namespace byhj
 {
@@ -41,7 +41,7 @@ private:
 	void DrawFps();
 	void DrawInfo(); 
 
-	byhj::Cube m_Cube;
+	byhj::Hill m_Hill;
 	byhj::D3DFont m_Font;
 	byhj::D3DTimer m_Timer;
 	byhj::D3DCamera m_Camera;

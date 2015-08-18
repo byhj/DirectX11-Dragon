@@ -34,7 +34,7 @@ void RenderSystem::v_Render()
 	//XMMATRIX Model = XMMatrixTranslation(0.0f, 0.0f, -0.5f);
    // XMStoreFloat4x4(&m_Matrix.model, XMMatrixTranspose(Model));
 
-	m_Cube.Render(m_pD3D11DeviceContext, m_Matrix);
+	m_Hill.Render(m_pD3D11DeviceContext, m_Matrix);
 
 	DrawInfo();
 
@@ -284,9 +284,9 @@ void RenderSystem::init_object()
 
 	m_Timer.Reset();
 	m_Font.init(m_pD3D11Device);
-	m_Camera.SetRadius(5.0f);
+	m_Camera.SetRadius(100.0f);
 
-	m_Cube.Init(m_pD3D11Device, m_pD3D11DeviceContext, GetHwnd());
+	m_Hill.Init(m_pD3D11Device, m_pD3D11DeviceContext, GetHwnd());
 }
 
 

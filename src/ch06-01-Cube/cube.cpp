@@ -24,13 +24,12 @@ void Cube::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceCon
 
 
 
-void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, XMMATRIX &model,
-	XMMATRIX &view, XMMATRIX &proj)
+void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer matrix)
 {
 	//Update the the mvp matrix
-	cbMatrix.model = XMMatrixTranspose(model);
-	cbMatrix.view  = XMMatrixTranspose(view);
-	cbMatrix.proj  = XMMatrixTranspose(proj);
+	cbMatrix.model = matrix.model;
+	cbMatrix.view  = matrix.view;
+	cbMatrix.proj  = matrix.proj;
 	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
 	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
 
@@ -41,7 +40,7 @@ void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, XMMATRIX &model,
 	offset = 0;
 	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 	pD3D11DeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
+	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	CubeShader.use(pD3D11DeviceContext);
 	pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 

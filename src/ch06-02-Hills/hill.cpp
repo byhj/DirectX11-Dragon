@@ -1,7 +1,46 @@
 #include "Hill.h"
 #include "d3d/d3dUtil.h"
 
-float Hill::GetHeight(float x, float z) const
+namespace byhj
+{
+void Hill::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
+{
+	init_buffer(pD3D11Device, pD3D11DeviceContext);
+	init_shader(pD3D11Device, hWnd);
+}
+
+
+void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix)
+{
+	cbMatrix.model = matrix.model;
+	cbMatrix.view  = matrix.view;
+	cbMatrix.proj  = matrix.proj;
+	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
+	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+
+	// Set vertex buffer stride and offset
+	unsigned int stride;
+	unsigned int offset;
+	stride = sizeof(Vertex);
+	offset = 0;
+	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+	pD3D11DeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); 
+
+	CubeShader.use(pD3D11DeviceContext);
+	pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+
+}
+
+void Hill::Shutdown()
+{
+	ReleaseCOM(m_pMVPBuffer)
+	ReleaseCOM(m_pVertexBuffer)
+	ReleaseCOM(m_pIndexBuffer)
+	ReleaseCOM(m_pInputLayout)
+}
+
+ float Hill::GetHeight(float x, float z) const
 {
 	return 0.3f * ( z*sinf(0.1f * x) + x*cosf(0.1f * z) );
 }
@@ -101,4 +140,7 @@ void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	CubeShader.attachVS(L"Hill.vsh", pInputLayoutDesc, numElements);
 	CubeShader.attachPS(L"Hill.psh");
 	CubeShader.end();
+}
+
+
 }
