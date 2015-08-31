@@ -4,8 +4,8 @@
 #include <d3d11.h>
 #include <xnamath.h>
 
+#include "d3dx11effect.h"
 #include "d3d/d3dDebug.h"
-#include "d3d/d3dShader.h"
 #include "d3d/d3dUtility.h"
 
 namespace byhj
@@ -32,11 +32,15 @@ private:
 		XMFLOAT3 Pos;
 		XMFLOAT4 Color;
 	};
-	byhj::Shader CubeShader;
+
+	ID3DX11Effect           *m_pEffect          = nullptr;
+	ID3DX11EffectTechnique  *m_pEffectTechnique = nullptr;
+	ID3DX11EffectMatrixVariable *m_pWorld = nullptr;
+	ID3DX11EffectMatrixVariable *m_pView = nullptr;
+	ID3DX11EffectMatrixVariable *m_pProj = nullptr;
 
 	ID3D11Buffer        *m_pVertexBuffer = nullptr;
 	ID3D11Buffer        *m_pIndexBuffer  = nullptr;
-	ID3D11Buffer        *m_pMVPBuffer    = nullptr;
 	ID3D11InputLayout   *m_pInputLayout  = nullptr;
 
 	int m_VertexCount = 0;

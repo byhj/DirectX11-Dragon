@@ -1,5 +1,6 @@
 #include "cube.h"
 #include "d3d/d3dUtil.h"
+#include <D3DX11.h>
 
 
 namespace byhj
@@ -26,12 +27,9 @@ void Cube::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceCon
 
 void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer matrix)
 {
-	//Update the the mvp matrix
-	cbMatrix.model = matrix.model;
-	cbMatrix.view  = matrix.view;
-	cbMatrix.proj  = matrix.proj;
-	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
-	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+
+	pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
+	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Set vertex buffer stride and offset
 	unsigned int stride;
@@ -40,15 +38,25 @@ void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer m
 	offset = 0;
 	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 	pD3D11DeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	CubeShader.use(pD3D11DeviceContext);
-	pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+
+	m_pWorld->SetMatrix(reinterpret_cast< float* >( &matrix.model ));
+	m_pView->SetMatrix(reinterpret_cast< float* >( &matrix.view ));
+	m_pProj->SetMatrix(reinterpret_cast< float* >( &matrix.proj ));
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	m_pEffectTechnique->GetDesc(&techDesc);
+	for ( UINT p = 0; p<techDesc.Passes; ++p )
+	{
+		m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
+		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+	}
+
+
 
 }
 
 void Cube::Shutdown()
 {
-	ReleaseCOM(m_pMVPBuffer)
 	ReleaseCOM(m_pVertexBuffer)
 	ReleaseCOM(m_pIndexBuffer)
 	ReleaseCOM(m_pInputLayout)
@@ -61,14 +69,14 @@ void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	/////////////////////////////Vertex Buffer//////////////////////////////
 	Vertex VertexData[] =
 	{
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), Colors::White   },
-		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), Colors::Black   },
-		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), Colors::Red     },
-		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), Colors::Green   },
-		{ XMFLOAT3(-1.0f, -1.0f, +1.0f), Colors::Blue    },
-		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), Colors::Yellow  },
-		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), Colors::Cyan    },
-		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), Colors::Magenta }
+		{XMFLOAT3(-1.0f, -1.0f, -1.0f), Colors::White},
+		{XMFLOAT3(-1.0f, +1.0f, -1.0f), Colors::Black},
+		{XMFLOAT3(+1.0f, +1.0f, -1.0f), Colors::Red},
+		{XMFLOAT3(+1.0f, -1.0f, -1.0f), Colors::Green},
+		{XMFLOAT3(-1.0f, -1.0f, +1.0f), Colors::Blue},
+		{XMFLOAT3(-1.0f, +1.0f, +1.0f), Colors::Yellow},
+		{XMFLOAT3(+1.0f, +1.0f, +1.0f), Colors::Cyan},
+		{XMFLOAT3(+1.0f, -1.0f, +1.0f), Colors::Magenta}
 	};
 	m_VertexCount = ARRAYSIZE(VertexData);
 
@@ -126,45 +134,60 @@ void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	hr = pD3D11Device->CreateBuffer(&indexBufferDesc, &IBO, &m_pIndexBuffer);
 	DebugHR(hr);
 
-	////////////////////////////////Const Buffer//////////////////////////////////////
 
-	D3D11_BUFFER_DESC mvpDesc;	
-	ZeroMemory(&mvpDesc, sizeof(D3D11_BUFFER_DESC));
-	mvpDesc.Usage          = D3D11_USAGE_DEFAULT;
-	mvpDesc.ByteWidth      = sizeof(MatrixBuffer);
-	mvpDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
-	mvpDesc.CPUAccessFlags = 0;
-	mvpDesc.MiscFlags      = 0;
-	hr = pD3D11Device->CreateBuffer(&mvpDesc, NULL, &m_pMVPBuffer);
-	DebugHR(hr);
 }
 
 void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 {
-	//Shader interface information
-	D3D11_INPUT_ELEMENT_DESC pInputLayoutDesc[2];
-	pInputLayoutDesc[0].SemanticName         = "POSITION";
-	pInputLayoutDesc[0].SemanticIndex        = 0;
-	pInputLayoutDesc[0].Format               = DXGI_FORMAT_R32G32B32_FLOAT;
-	pInputLayoutDesc[0].InputSlot            = 0;
-	pInputLayoutDesc[0].AlignedByteOffset    = 0;
-	pInputLayoutDesc[0].InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
-	pInputLayoutDesc[0].InstanceDataStepRate = 0;
 
-	pInputLayoutDesc[1].SemanticName         = "COLOR";
-	pInputLayoutDesc[1].SemanticIndex        = 0;
-	pInputLayoutDesc[1].Format               = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	pInputLayoutDesc[1].InputSlot            = 0;
-	pInputLayoutDesc[1].AlignedByteOffset    = 12;
-	pInputLayoutDesc[1].InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
-	pInputLayoutDesc[1].InstanceDataStepRate = 0;
+	DWORD shaderFlags = 0;
+#if defined( DEBUG ) || defined( _DEBUG )
+	shaderFlags |= D3D10_SHADER_DEBUG;
+	shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
+#endif
 
-	unsigned numElements = ARRAYSIZE(pInputLayoutDesc);
+	ID3D10Blob* compiledShader = 0;
+	ID3D10Blob* compilationMsgs = 0;
+	HRESULT hr = D3DX11CompileFromFile(L"color.fx", 0, 0, 0, "fx_5_0", shaderFlags,
+		0, 0, &compiledShader, &compilationMsgs, 0);
 
-	CubeShader.init(pD3D11Device, hWnd);
-	CubeShader.attachVS(L"cube.vsh", pInputLayoutDesc, numElements);
-	CubeShader.attachPS(L"cube.psh");
-	CubeShader.end();
+	// compilationMsgs can store errors or warnings.
+	if ( compilationMsgs!=0 )
+	{
+		MessageBoxA(0, ( char* )compilationMsgs->GetBufferPointer(), 0, 0);
+		ReleaseCOM(compilationMsgs);
+	}
+
+	// Even if there are no compilationMsgs, check to make sure there were no other errors.
+	if ( FAILED(hr) )
+	{
+		DXTrace(__FILE__, ( DWORD )__LINE__, hr, L"D3DX11CompileFromFile", true);
+	}
+
+	D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
+		0, pD3D11Device, &m_pEffect);
+
+	m_pEffectTechnique = m_pEffect->GetTechniqueByName("ColorTech");
+
+
+	m_pWorld = m_pEffect->GetVariableByName("World")->AsMatrix();
+	m_pView  = m_pEffect->GetVariableByName("View")->AsMatrix();
+	m_pProj  = m_pEffect->GetVariableByName("Proj")->AsMatrix();
+
+	// Done with compiled shader.
+	ReleaseCOM(compiledShader);
+
+	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+	
+	D3DX11_PASS_DESC passDesc;
+	m_pEffectTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
+
+	pD3D11Device->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
+		                            passDesc.IAInputSignatureSize, &m_pInputLayout);
 }
 
 }

@@ -48,6 +48,9 @@
     <ClCompile Include="..\..\include\d3d\d3dUtility.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\include\d3d\d3dUtil.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cube.h">
@@ -80,13 +83,22 @@
     <ClInclude Include="..\..\include\d3d\d3dUtility.h">
       <Filter>Framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\d3d\d3dUtil.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\d3dxGlobal.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\d3dx11effect.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cube.psh">
+    <FxCompile Include="cube.fx">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="cube.vsh">
+    </FxCompile>
+    <FxCompile Include="color.fx">
       <Filter>Resource Files</Filter>
-    </None>
+    </FxCompile>
   </ItemGroup>
 </Project>

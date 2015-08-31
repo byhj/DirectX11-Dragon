@@ -5,6 +5,7 @@
   <PropertyGroup>
     <OutDir>$(SolutionDir)\bin\x86</OutDir>
     <IntDir>$(SolutionDir)\temp</IntDir>
+    <IncludePath>$(VC_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
@@ -12,7 +13,7 @@
       <AdditionalLibraryDirectories>$(DXSDK_DIR)\lib\x86;$(SolutionDir)\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(WINDOW7SDK)\include;$(DXSDK_DIR)\include;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Windows7SDK)\include;$(DXSDK_DIR)\include;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

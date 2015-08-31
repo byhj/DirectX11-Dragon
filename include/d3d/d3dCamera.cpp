@@ -29,7 +29,7 @@ void D3DCamera::update()
 	XMMATRIX View = XMMatrixLookAtLH(pos, target, up);
 	XMMATRIX Proj  = XMMatrixPerspectiveFovLH( XMConvertToRadians(45.0f), m_aspect, 1.0f, 1000.0f);
 
-	XMStoreFloat4x4(&m_View, XMMatrixTranspose(View) );
+	XMStoreFloat4x4(&m_View, View );
 	XMStoreFloat4x4(&m_Proj, XMMatrixTranspose(Proj) );
 }
 
