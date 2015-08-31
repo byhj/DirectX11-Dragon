@@ -31,8 +31,6 @@ void RenderSystem::v_Render()
 	BeginScene();
 
 	m_Matrix.view = m_Camera.GetViewMatrix();
-	//XMMATRIX Model = XMMatrixTranslation(0.0f, 0.0f, -0.5f);
-   // XMStoreFloat4x4(&m_Matrix.model, XMMatrixTranspose(Model));
 
 	m_Hill.Render(m_pD3D11DeviceContext, m_Matrix);
 
@@ -172,32 +170,6 @@ void RenderSystem::init_device()
 	hr = m_pD3D11Device->CreateDepthStencilView(m_pDepthStencilBuffer, &depthStencilViewDesc, &m_pDepthStencilView);
 	DebugHR(hr);
 
-	/*
-	// ////////////Clear the second depth stencil state before setting the parameters.//////////////////////
-	D3D11_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
-	ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
-	// Now create a second depth stencil state which turns off the Z buffer for 2D rendering.  The only difference is
-	// that DepthEnable is set to false, all other parameters are the same as the other depth stencil state.
-	depthDisabledStencilDesc.DepthEnable = false;
-	depthDisabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	depthDisabledStencilDesc.StencilEnable = true;
-	depthDisabledStencilDesc.StencilReadMask = 0xFF;
-	depthDisabledStencilDesc.StencilWriteMask = 0xFF;
-	depthDisabledStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthDisabledStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	depthDisabledStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthDisabledStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	depthDisabledStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthDisabledStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	depthDisabledStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	// Create the state using the device.
-	hr = m_pD3D11Device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_pDepthDisabledStencilState);
-	DebugHR(hr);
-
-	*/
 
 	// Setup the raster description which will determine how and what polygons will be drawn.
 	D3D11_RASTERIZER_DESC rasterDesc;
@@ -274,9 +246,9 @@ void RenderSystem::init_camera()
 	XMMATRIX Proj      = XMMatrixPerspectiveFovLH(0.4f*3.14f, GetAspect(), 1.0f, 1000.0f);
 	XMMATRIX Model     = XMMatrixIdentity();
 
-	XMStoreFloat4x4(&m_Matrix.model, XMMatrixTranspose(Model) );
-	XMStoreFloat4x4(&m_Matrix.view,  XMMatrixTranspose(View) );
-	XMStoreFloat4x4(&m_Matrix.proj,  XMMatrixTranspose(Proj) );
+	XMStoreFloat4x4(&m_Matrix.model, Model);
+	XMStoreFloat4x4(&m_Matrix.view,  View );
+	XMStoreFloat4x4(&m_Matrix.proj,  Proj );
 }
 
 void RenderSystem::init_object()

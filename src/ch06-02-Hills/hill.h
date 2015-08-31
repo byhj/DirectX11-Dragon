@@ -6,10 +6,10 @@
 #include <d3d11.h>
 #include <xnamath.h>
 
+#include "d3dx11effect.h"
 #include "d3d/d3dDebug.h"
-#include "d3d/d3dShader.h"
-#include "d3d/d3dGeometry.h"
 #include "d3d/d3dUtility.h"
+#include "d3d/d3dGeometry.h"
 
 namespace byhj
 {
@@ -21,14 +21,13 @@ public:
    {
       m_pVertexBuffer = NULL;
 	  m_pIndexBuffer  = NULL;
-	  m_pMVPBuffer    = NULL;
 	  m_pInputLayout  = NULL;
 	  m_VertexCount   = 0;
 	  m_IndexCount    = 0;
    }
    ~Hill() {}
 
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer matrix);
    void Shutdown();
 
 
@@ -46,10 +45,14 @@ private:
 
 	byhj::MatrixBuffer cbMatrix;
 
-	byhj::Shader CubeShader;
+	ID3DX11Effect               *m_pEffect          = nullptr;
+	ID3DX11EffectTechnique      *m_pEffectTechnique = nullptr;
+	ID3DX11EffectMatrixVariable *m_pWorld           = nullptr;
+	ID3DX11EffectMatrixVariable *m_pView            = nullptr;
+	ID3DX11EffectMatrixVariable *m_pProj            = nullptr;
+
 	ID3D11Buffer        *m_pVertexBuffer;
 	ID3D11Buffer        *m_pIndexBuffer;
-	ID3D11Buffer        *m_pMVPBuffer;
 	ID3D11InputLayout   *m_pInputLayout;
 
 	std::vector<Vertex>  m_VertexData;
