@@ -14,6 +14,42 @@ namespace byhj
 		init_shader(pD3D11Device, hWnd);
 	}
 
+	void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix)
+	{
+		cbMatrix.model = matrix.model;
+		cbMatrix.view = matrix.view;
+		cbMatrix.proj = matrix.proj;
+
+		// Set vertex buffer stride and offset
+		unsigned int stride;
+		unsigned int offset;
+		stride = sizeof(Vertex);
+		offset = 0;
+		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+		pD3D11DeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
+		pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		m_pWorld->SetMatrix(reinterpret_cast<float*>(&cbMatrix.model));
+		m_pView->SetMatrix(reinterpret_cast<float*>(&cbMatrix.view));
+		m_pProj->SetMatrix(reinterpret_cast<float*>(&cbMatrix.proj));
+
+		D3DX11_TECHNIQUE_DESC techDesc;
+		m_pEffectTechnique->GetDesc(&techDesc);
+		for (UINT p = 0; p < techDesc.Passes; ++p)
+		{
+			m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
+			pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+		}
+
+	}
+
+	void Model::Shutdown()
+	{
+		ReleaseCOM(m_pVertexBuffer)
+		ReleaseCOM(m_pIndexBuffer)
+		ReleaseCOM(m_pInputLayout)
+	}
 
 	void Model::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
 	{
@@ -28,8 +64,10 @@ namespace byhj
 			return;
 		}
 		std::string ignore;
+		int tCount;
+
 		fin >> ignore >> m_VertexCount;
-		fin >> ignore >> m_IndexCount;
+		fin >> ignore >> tCount;
 		fin >> ignore >> ignore>>ignore>>ignore;
 
 		m_VertexData.resize(m_VertexCount);
@@ -44,6 +82,13 @@ namespace byhj
 				>>m_VertexData[i].Normal.z;
 		}
 		fin>>ignore>>ignore>>ignore;
+		m_IndexCount = 3 * tCount;
+		m_IndexData.resize(m_IndexCount);
+		for (UINT i = 0; i < tCount; ++i)
+		{
+			fin >> m_IndexData[i * 3 + 0] >> m_IndexData[i * 3 + 1] >> m_IndexData[i * 3 + 2];
+		}
+
 
 		D3D11_BUFFER_DESC vertexBufferDesc;
 		vertexBufferDesc.Usage               = D3D11_USAGE_IMMUTABLE;
@@ -70,7 +115,7 @@ namespace byhj
 		indexBufferDesc.StructureByteStride = 0;
 
 		D3D11_SUBRESOURCE_DATA IBO;
-		IBO.pSysMem = &m_IndexData;
+		IBO.pSysMem = &m_IndexData[0];
 		hr = pD3D11Device->CreateBuffer(&indexBufferDesc, &IBO, &m_pIndexBuffer);
 		DebugHR(hr);
 

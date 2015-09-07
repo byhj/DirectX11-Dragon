@@ -9,13 +9,13 @@ cbuffer MatrixBuffer : register(b0)
  struct VS_IN
 {
     float4 Pos   : POSITION;
-    float3 Normal: NORMAL;
+    float4 Color : COLOR0;
 };
 
 struct VS_OUT
 {
     float4 Pos   : SV_POSITION;
-    float3 Normal: NORMAL;
+    float4 Color : COLOR0;
 };
 
 VS_OUT VS( VS_IN vs_in)
@@ -27,7 +27,7 @@ VS_OUT VS( VS_IN vs_in)
    vs_out.Pos = mul(vs_out.Pos, g_View);
    vs_out.Pos = mul(vs_out.Pos, g_Proj);
 
-   vs_out.Normal = vs_in.Normal;
+   vs_out.Color = vs_in.Color;
  
    return vs_out;
 }
@@ -35,10 +35,7 @@ VS_OUT VS( VS_IN vs_in)
 
 float4 PS(VS_OUT ps_in) : SV_TARGET
 {
-   ps_in.Normal = normalize(ps_in.Normal);
-   float nz = abs(ps_in.Normal.z);
-
-   float4 pixelColor = 	float4(nz, nz, nz, 1.0f);
+   float4 pixelColor =  ps_in.Color;
 
    return pixelColor;
 }
