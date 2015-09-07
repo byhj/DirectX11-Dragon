@@ -1,5 +1,5 @@
 #include "Hill.h"
-#include "d3d/d3dUtil.h"
+
 
 namespace byhj
 {
@@ -10,7 +10,7 @@ void Hill::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceCon
 	init_shader(pD3D11Device, hWnd);
 }
 
-void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix, D3DTimer *timer, D3DCamera *camera)
+void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DTimer *timer, D3DCamera *camera)
 {
 		// Every quarter second, generate a random wave.
 		static float t_base = 0.0f;
@@ -152,8 +152,8 @@ void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	init_light();
 
 	HRESULT hr;
-	D3DGeometry::MeshData gridMesh;
-	geometry.CreateGrid(160.0f, 160.0f, 50, 50, gridMesh);
+	d3d::Geometry::MeshData gridMesh;
+	m_Geometry.CreateGrid(160.0f, 160.0f, 50, 50, gridMesh);
 
 	/////////////////////////////Vertex Buffer//////////////////////////////
 

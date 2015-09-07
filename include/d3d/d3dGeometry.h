@@ -7,11 +7,11 @@
 
 #include <xnamath.h>
 
-class D3DGeometry
+class d3d::Geometry
 {
 public:
-	D3DGeometry() {}
-   ~D3DGeometry() {}
+	d3d::Geometry() {}
+   ~d3d::Geometry() {}
 
 public:
 	struct  Vertex

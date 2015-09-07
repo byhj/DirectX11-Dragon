@@ -1,6 +1,9 @@
-#include "d3dShader.h"
+#include "Shader.h"
 
 namespace byhj
+{
+
+namespace d3d
 {
 
 void Shader::init(ID3D11Device *pD3D11Device, HWND hWnd)
@@ -30,7 +33,7 @@ void Shader::Debug(ID3D10Blob *pErrorMessage, HWND hwnd, WCHAR *shaderFileName)
 
 }
 
-bool Shader::attachVS(WCHAR* Filename,  D3D11_INPUT_ELEMENT_DESC pInputLayoutDesc[], unsigned numElements)
+bool Shader::attachVS(WCHAR* Filename, std::vector<D3D11_INPUT_ELEMENT_DESC> vInputLayoutDesc)
 {	
 	HRESULT result;
 	ID3D10Blob* errorMessage = 0;
@@ -53,8 +56,8 @@ bool Shader::attachVS(WCHAR* Filename,  D3D11_INPUT_ELEMENT_DESC pInputLayoutDes
 	{
 		return false;
 	}
-
-	result = pD3D11Device->CreateInputLayout(pInputLayoutDesc, numElements, VertexShaderBuffer->GetBufferPointer(), 
+	auto numElements = vInputLayoutDesc.size();
+	result = pD3D11Device->CreateInputLayout(&vInputLayoutDesc[0], numElements, VertexShaderBuffer->GetBufferPointer(), 
 		VertexShaderBuffer->GetBufferSize(), &pInputLayout);
 	if(FAILED(result))
 	{
@@ -239,6 +242,6 @@ void Shader::end()
 	hWnd = 0;
 }
 
-
+}
 
 }

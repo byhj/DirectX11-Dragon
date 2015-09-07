@@ -1,7 +1,7 @@
-#include "d3dGeometry.h"
+#include "d3d::Geometry.h"
 #include "d3dUtil.h"
 
-void D3DGeometry::CreateCube(float width, float height, float depth, MeshData &mesh)
+void d3d::Geometry::CreateCube(float width, float height, float depth, MeshData &mesh)
 {
 	Vertex vertex[24];
 
@@ -79,7 +79,7 @@ void D3DGeometry::CreateCube(float width, float height, float depth, MeshData &m
 
 //void CreateSphere(int radius, MeshData &mesh);
 
-void D3DGeometry::CreatePlane(float width, float depth, MeshData &mesh)
+void d3d::Geometry::CreatePlane(float width, float depth, MeshData &mesh)
 {
 
 	float w2 = width  * 0.5f;
@@ -104,7 +104,7 @@ void D3DGeometry::CreatePlane(float width, float depth, MeshData &mesh)
 	mesh.IndexData.assign(index, index + 6);
 }
 
-void D3DGeometry::CreateGrid(float width, float depth, UINT m, UINT n, MeshData& mesh)
+void d3d::Geometry::CreateGrid(float width, float depth, UINT m, UINT n, MeshData& mesh)
 {
 	UINT vertexCount = m * n;
 	UINT faceCount   = (m-1) * (n-1) * 2;
@@ -152,7 +152,7 @@ void D3DGeometry::CreateGrid(float width, float depth, UINT m, UINT n, MeshData&
 }
 
 
-void D3DGeometry::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
+void d3d::Geometry::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
 	//
 	// Compute the vertices stating at the top pole and moving down the stacks.
@@ -247,7 +247,7 @@ void D3DGeometry::CreateSphere(float radius, UINT sliceCount, UINT stackCount, M
 	}
 }
 
-void D3DGeometry::Subdivide(MeshData& meshData)
+void d3d::Geometry::Subdivide(MeshData& meshData)
 {
 	// Save a copy of the input geometry.
 	MeshData inputCopy = meshData;
@@ -326,7 +326,7 @@ void D3DGeometry::Subdivide(MeshData& meshData)
 }
 
 
-void D3DGeometry::CreateGeosphere(float radius, UINT numSubdivisions, MeshData& meshData)
+void d3d::Geometry::CreateGeosphere(float radius, UINT numSubdivisions, MeshData& meshData)
 {
 	// Put a cap on the number of subdivisions.
 	numSubdivisions = numSubdivisions < 5u ? numSubdivisions :5u;
@@ -388,7 +388,7 @@ void D3DGeometry::CreateGeosphere(float radius, UINT numSubdivisions, MeshData& 
 	}
 }
 
-void D3DGeometry::CreateCylinder(float bottomRadius, float topRadius, float height, UINT sliceCount, UINT stackCount, MeshData& meshData)
+void d3d::Geometry::CreateCylinder(float bottomRadius, float topRadius, float height, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
 	meshData.VertexData.clear();
 	meshData.IndexData.clear();
@@ -481,7 +481,7 @@ void D3DGeometry::CreateCylinder(float bottomRadius, float topRadius, float heig
 	BuildCylinderBottomCap(bottomRadius, topRadius, height, sliceCount, stackCount, meshData);
 }
 
-void D3DGeometry::BuildCylinderTopCap(float bottomRadius, float topRadius, float height, 
+void d3d::Geometry::BuildCylinderTopCap(float bottomRadius, float topRadius, float height, 
 											UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
 	UINT baseIndex = (UINT)meshData.VertexData.size();
@@ -517,7 +517,7 @@ void D3DGeometry::BuildCylinderTopCap(float bottomRadius, float topRadius, float
 	}
 }
 
-void D3DGeometry::BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, 
+void d3d::Geometry::BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, 
 											   UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
 	// 

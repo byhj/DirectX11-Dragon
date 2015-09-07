@@ -1,5 +1,5 @@
 #include "Geometry.h"
-#include "d3d/d3dUtil.h"
+
 
 namespace byhj
 {
@@ -11,7 +11,7 @@ void Geometry::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11Devic
 	init_shader(pD3D11Device, hWnd);
 }
 
-void Geometry::Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix, D3DCamera *camera)
+void Geometry::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DCamera *camera)
 {
 		//
 	// Switch the number of lights based on key presses.
@@ -169,11 +169,11 @@ void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D
 	}
 
 	HRESULT hr;
-	D3DGeometry::MeshData box;
-	D3DGeometry::MeshData grid;
-	D3DGeometry::MeshData sphere;
-	D3DGeometry::MeshData cylinder;
-	D3DGeometry geoGen;
+	d3d::Geometry::MeshData box;
+	d3d::Geometry::MeshData grid;
+	d3d::Geometry::MeshData sphere;
+	d3d::Geometry::MeshData cylinder;
+	d3d::Geometry geoGen;
 	geoGen.CreateCube(1.0f, 1.0f, 1.0f, box);
 	geoGen.CreateGrid(20.0f, 30.0f, 60, 40, grid);
 	geoGen.CreateSphere(0.5f, 20, 20, sphere);

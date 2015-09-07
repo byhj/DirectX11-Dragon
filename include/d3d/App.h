@@ -1,5 +1,5 @@
-#ifndef D3DAPP_H
-#define D3DAPP_H
+#ifndef APP_H
+#define APP_H
 
 #include <string>
 #define WIN32_LEAN_AND_MEAN
@@ -30,14 +30,17 @@
 namespace byhj
 {
 
-class D3DApp
+namespace d3d
+{
+
+class App
 {
 public:
-	D3DApp() :m_AppName(L"DirectX11: "), m_WndClassName(L"D3DWindow")
+	App() :m_AppName(L"DirectX11: "), m_WndClassName(L"D3DWindow")
 	{
 
 	}
-	virtual ~D3DApp() {}
+	virtual ~App() {}
 
 	void InitApp();
 	int Run();
@@ -77,6 +80,9 @@ private:
 	HINSTANCE m_hInstance;
 	HWND      m_hWnd;
 };
+
+
+}
 
 }
 #endif

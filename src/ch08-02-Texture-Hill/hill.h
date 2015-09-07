@@ -7,12 +7,12 @@
 
 #include "d3d/d3dDebug.h"
 #include "d3d/d3dShader.h"
-#include "d3d/d3dGeometry.h"
+#include "d3d/Geometry.h"
 #include "d3d/d3dWave.h"
-#include "d3d/d3dTimer.h"
-#include "d3d/d3dUtil.h"
+#include "d3d/Timer.h"
+
 #include "d3d/d3dLight.h"
-#include "d3d/d3dCamera.h"
+#include "d3d/Camera.h"
 #include "D3DX11.h"
 
 
@@ -100,7 +100,7 @@ private:
 	int m_VertexCount;
 	int m_IndexCount;
 
-	D3DGeometry geometry;
+	d3d::Geometry m_Geometry;
 	D3DWave     wave;
 
 	//Light and Material

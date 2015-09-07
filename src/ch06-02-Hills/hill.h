@@ -8,8 +8,8 @@
 
 #include "d3dx11effect.h"
 #include "d3d/d3dDebug.h"
-#include "d3d/d3dUtility.h"
-#include "d3d/d3dGeometry.h"
+#include "d3d/Utility.h"
+#include "d3d/Geometry.h"
 
 namespace byhj
 {
@@ -17,17 +17,10 @@ namespace byhj
 class Hill 
 {
 public:
-   Hill()
-   {
-      m_pVertexBuffer = NULL;
-	  m_pIndexBuffer  = NULL;
-	  m_pInputLayout  = NULL;
-	  m_VertexCount   = 0;
-	  m_IndexCount    = 0;
-   }
+	Hill() {}
    ~Hill() {}
 
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer matrix);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, d3d::MatrixBuffer matrix);
    void Shutdown();
 
 
@@ -43,7 +36,7 @@ private:
 		XMFLOAT4 Color;
 	};
 
-	byhj::MatrixBuffer cbMatrix;
+	d3d::MatrixBuffer cbMatrix;
 
 	ID3DX11Effect               *m_pEffect          = nullptr;
 	ID3DX11EffectTechnique      *m_pEffectTechnique = nullptr;
@@ -51,9 +44,9 @@ private:
 	ID3DX11EffectMatrixVariable *m_pView            = nullptr;
 	ID3DX11EffectMatrixVariable *m_pProj            = nullptr;
 
-	ID3D11Buffer        *m_pVertexBuffer;
-	ID3D11Buffer        *m_pIndexBuffer;
-	ID3D11InputLayout   *m_pInputLayout;
+	ID3D11Buffer        *m_pVertexBuffer = nullptr;
+	ID3D11Buffer        *m_pIndexBuffer  = nullptr;
+	ID3D11InputLayout   *m_pInputLayout  = nullptr;
 
 	std::vector<Vertex>  m_VertexData;
 	std::vector<UINT>    m_IndexData;
@@ -61,7 +54,7 @@ private:
 	int m_VertexCount;
 	int m_IndexCount;
 
-	D3DGeometry geometry;
+	d3d::Geometry m_Geometry;
 };
 
 }

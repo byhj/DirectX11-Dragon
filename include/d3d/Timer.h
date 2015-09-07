@@ -1,16 +1,19 @@
-#ifndef D3DTIMER_H
-#define D3DTIMER_H
+#ifndef Timer_H
+#define Timer_H
 
 #include <windows.h>
 
 namespace byhj
 {
 
+namespace d3d
+{
 
-class D3DTimer
+
+class Timer
 {
 public:
-	D3DTimer();
+	Timer();
 
 	float GetTotalTime() const;    //In seconds
 	float GetDeltaTime() const; //In seconds
@@ -34,6 +37,7 @@ private:
 
 };
 
+}
 
 }
 

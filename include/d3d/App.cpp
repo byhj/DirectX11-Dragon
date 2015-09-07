@@ -1,13 +1,15 @@
-#include "d3dApp.h"
+#include "App.h"
 
 namespace byhj
 {
 
+namespace d3d
+{
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-static D3DApp *AppHandle = 0;
+static App *AppHandle = 0;
 
-int D3DApp::Run()
+int App::Run()
 {	
 	InitApp();
 
@@ -33,7 +35,7 @@ int D3DApp::Run()
 	return (int)msg.wParam;
 }
 
-void D3DApp::InitApp()
+void App::InitApp()
 {
 	init_window();
 
@@ -42,7 +44,7 @@ void D3DApp::InitApp()
 }
 
 
-bool D3DApp::init_window()
+bool App::init_window()
 {
 	//Set the window in the middle of screen
 	m_ScreenWidth = GetSystemMetrics(SM_CXSCREEN) * 0.75;
@@ -103,7 +105,7 @@ bool D3DApp::init_window()
 }
 
 
-LRESULT CALLBACK D3DApp::MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK App::MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -158,5 +160,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 }
 
 
+}
 
 }

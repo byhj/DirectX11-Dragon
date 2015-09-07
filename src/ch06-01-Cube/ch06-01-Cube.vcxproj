@@ -66,38 +66,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\include\d3d\d3dApp.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dCamera.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dFont.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dGeometry.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dShader.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dTimer.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dUtil.cpp" />
-    <ClCompile Include="..\..\include\d3d\d3dUtility.cpp" />
+    <ClCompile Include="..\..\include\d3d\App.cpp" />
+    <ClCompile Include="..\..\include\d3d\Camera.cpp" />
+    <ClCompile Include="..\..\include\d3d\Font.cpp" />
+    <ClCompile Include="..\..\include\d3d\Geometry.cpp" />
+    <ClCompile Include="..\..\include\d3d\Shader.cpp" />
+    <ClCompile Include="..\..\include\d3d\Timer.cpp" />
+    <ClCompile Include="..\..\include\d3d\Utility.cpp" />
     <ClCompile Include="ch06-01-Cube.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\d3dx11effect.h" />
-    <ClInclude Include="..\..\include\d3dxGlobal.h" />
-    <ClInclude Include="..\..\include\d3d\d3dApp.h" />
-    <ClInclude Include="..\..\include\d3d\d3dCamera.h" />
-    <ClInclude Include="..\..\include\d3d\d3dDebug.h" />
-    <ClInclude Include="..\..\include\d3d\d3dFont.h" />
-    <ClInclude Include="..\..\include\d3d\d3dGeometry.h" />
-    <ClInclude Include="..\..\include\d3d\d3dShader.h" />
-    <ClInclude Include="..\..\include\d3d\d3dTimer.h" />
-    <ClInclude Include="..\..\include\d3d\d3dUtil.h" />
-    <ClInclude Include="..\..\include\d3d\d3dUtility.h" />
+    <ClInclude Include="..\..\include\d3d\App.h" />
+    <ClInclude Include="..\..\include\d3d\Camera.h" />
+    <ClInclude Include="..\..\include\d3d\Font.h" />
+    <ClInclude Include="..\..\include\d3d\Geometry.h" />
+    <ClInclude Include="..\..\include\d3d\Shader.h" />
+    <ClInclude Include="..\..\include\d3d\Timer.h" />
+    <ClInclude Include="..\..\include\d3d\Utility.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="RenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="color.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="cube.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>

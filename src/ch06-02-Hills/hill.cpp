@@ -1,5 +1,4 @@
 #include "Hill.h"
-#include "d3d/d3dUtil.h"
 #include <D3DX11.h>
 
 namespace byhj
@@ -11,18 +10,18 @@ void Hill::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceCon
 }
 
 
-void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer matrix)
+void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, d3d::MatrixBuffer matrix)
 {
 
 	// Set vertex buffer stride and offset
 	unsigned int stride;
 	unsigned int offset;
-	stride = sizeof(Vertex);
+	stride = sizeof( Vertex );
 	offset = 0;
 	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 	pD3D11DeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); 
-
+	pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
 
 	m_pWorld->SetMatrix(reinterpret_cast< float* >( &matrix.model ));
 	m_pView->SetMatrix( reinterpret_cast< float* >( &matrix.view ));
@@ -54,8 +53,8 @@ void Hill::Shutdown()
 void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
 {
 	HRESULT hr;
-	D3DGeometry::MeshData gridMesh;
-	geometry.CreateGrid(160.0f, 160.0f, 50, 50, gridMesh);
+	d3d::Geometry::MeshData gridMesh;
+	m_Geometry.CreateGrid(160.0f, 160.0f, 50, 50, gridMesh);
 
 	/////////////////////////////Vertex Buffer//////////////////////////////
 

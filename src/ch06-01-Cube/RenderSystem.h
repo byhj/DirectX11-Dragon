@@ -1,38 +1,32 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
-#include "d3d/d3dApp.h"
-#include "d3d/d3dFont.h"
-#include "d3d/d3dTimer.h"
-#include "d3d/d3dCamera.h"
-#include "d3d/d3dUtility.h"
+#include "d3d/App.h"
+#include "d3d/Font.h"
+#include "d3d/Timer.h"
+#include "d3d/Camera.h"
+#include "d3d/Utility.h"
 
 #include "Cube.h"
 
 namespace byhj
 {
 
-	class RenderSystem : public D3DApp
+class RenderSystem : public d3d::App
 {
 public:
 	RenderSystem();
 	~RenderSystem();
 
 	void v_Init();
+	void v_Update();
 	void v_Render();
 	void v_Shutdown();
-
-	void UpdateScene();
-	void v_OnMouseDown(WPARAM btnState, int x, int y);
-	void v_OnMouseMove(WPARAM btnState, int x, int y);
-	void v_OnMouseUp(WPARAM btnState, int x, int y);
-	void v_OnMouseWheel(WPARAM btnState, int x, int y);
 
 private:
 	void init_device();
 	void init_camera();
 	void init_object();
-	void init_fbo();
 
 	void BeginScene();
 	void EndScene();
@@ -42,10 +36,10 @@ private:
 	void DrawInfo(); 
 
 	byhj::Cube m_Cube;
-	byhj::D3DFont m_Font;
-	byhj::D3DTimer m_Timer;
-	byhj::D3DCamera m_Camera;
-	byhj::MatrixBuffer m_Matrix;
+	d3d::Font m_Font;
+	d3d::Timer m_Timer;
+	d3d::Camera m_Camera;
+	d3d::MatrixBuffer m_Matrix;
 
 	float fps = 0.0f;
 	int m_videoCardMemory;
@@ -62,5 +56,6 @@ private:
 	ID3D11RasterizerState    *m_pRasterState                = nullptr;
 
 };
+
 }
 #endif

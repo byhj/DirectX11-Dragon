@@ -1,9 +1,12 @@
-#include "d3dFont.h"
+#include "Font.h"
 
 namespace byhj
 {
 
-void D3DFont::drawFps(ID3D11DeviceContext *pD3D11DeviceContext, UINT fps)
+namespace d3d
+{
+
+void Font::drawFps(ID3D11DeviceContext *pD3D11DeviceContext, UINT fps)
 {
 	static WCHAR frameStr[255];
 	wsprintfW(frameStr, L"FPS: %u", fps);
@@ -19,7 +22,7 @@ void D3DFont::drawFps(ID3D11DeviceContext *pD3D11DeviceContext, UINT fps)
 		);
 }
 
-void D3DFont::drawText(ID3D11DeviceContext *pD3D11DeivceContext, const WCHAR *text, 
+void Font::drawText(ID3D11DeviceContext *pD3D11DeivceContext, const WCHAR *text, 
 					   float fontSize, float posX, float posY)
 {
 	m_pFontWrapper->DrawString(
@@ -33,5 +36,6 @@ void D3DFont::drawText(ID3D11DeviceContext *pD3D11DeivceContext, const WCHAR *te
 		);
 }
 
+}
 
 }

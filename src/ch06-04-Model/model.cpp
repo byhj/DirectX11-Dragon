@@ -1,5 +1,5 @@
 #include "model.h"
-#include "d3d/d3dUtil.h"
+
 #include <fstream>
 
 namespace byhj

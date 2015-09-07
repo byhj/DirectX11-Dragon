@@ -1,5 +1,5 @@
 #include "cube.h"
-#include "d3d/d3dUtil.h"
+
 
 namespace byhj
 {
@@ -11,7 +11,7 @@ void Cube::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceCon
 	init_texture(pD3D11Device);
 }
 
-void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix, D3DCamera *camera)
+void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DCamera *camera)
 {
 
 		// Set vertex buffer stride and offset
@@ -69,8 +69,8 @@ void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	init_light();
 
 	HRESULT hr;
-	D3DGeometry::MeshData box;
-	D3DGeometry geoGen;
+	d3d::Geometry::MeshData box;
+	d3d::Geometry geoGen;
 	geoGen.CreateCube(1.0f, 1.0f, 1.0f, box);
 
 	m_IndexCount  = box.IndexData.size();

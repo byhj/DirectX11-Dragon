@@ -1,11 +1,13 @@
-#include "d3dTimer.h"
+#include "Timer.h"
 
 namespace byhj
 {
 
+namespace d3d
+{
 
 
-D3DTimer::D3DTimer(): m_SecondsPerCount(0.0),
+Timer::Timer(): m_SecondsPerCount(0.0),
 	m_DeltaTime(0.0), 
 	m_BaseTime(0), 
 	m_PausedTime(0),
@@ -20,7 +22,7 @@ D3DTimer::D3DTimer(): m_SecondsPerCount(0.0),
 
 // Returns the total time elapsed since Reset() was called, NOT counting any
 // time when the clock is stopped.
-float D3DTimer::GetTotalTime() const
+float Timer::GetTotalTime() const
 {
 	// If we are stopped, do not count the time that has passed since we stopped.
 	// Moreover, if we previously already had a pause, the distance 
@@ -52,12 +54,12 @@ float D3DTimer::GetTotalTime() const
 	}
 }
 
-float D3DTimer::GetDeltaTime() const
+float Timer::GetDeltaTime() const
 {
 	return (float)m_DeltaTime;
 }
 
-void D3DTimer::Reset()
+void Timer::Reset()
 {
 	__int64 currTime;
 	QueryPerformanceCounter((LARGE_INTEGER*)&currTime);
@@ -68,7 +70,7 @@ void D3DTimer::Reset()
 	m_Stopped  = false;
 }
 
-void D3DTimer::Start()
+void Timer::Start()
 {
 	__int64 startTime;
 	QueryPerformanceCounter((LARGE_INTEGER*)&startTime);
@@ -90,7 +92,7 @@ void D3DTimer::Start()
 	}
 }
 
-void D3DTimer::Stop()
+void Timer::Stop()
 {
 	if( !m_Stopped )
 	{
@@ -102,7 +104,7 @@ void D3DTimer::Stop()
 	}
 }
 
-void D3DTimer::Count()
+void Timer::Count()
 {
 	if( m_Stopped )
 	{
@@ -129,5 +131,7 @@ void D3DTimer::Count()
 	}
 }
 
+
+}
 
 }

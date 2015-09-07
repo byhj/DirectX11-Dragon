@@ -1,13 +1,17 @@
-#ifndef D3DSHADER_H
-#define D3DSHADER_H
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <d3d11.h>
 #include <D3DX11async.h>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace byhj
+{
+
+namespace d3d
 {
 
 
@@ -19,7 +23,7 @@ public:
 	~Shader() {}
 
 	void init(ID3D11Device *pD3D11Device, HWND hWnd);
-	bool attachVS(WCHAR* Filename,  D3D11_INPUT_ELEMENT_DESC *pInputLayoutDesc, unsigned numElements);
+	bool attachVS(WCHAR* Filename, std::vector<D3D11_INPUT_ELEMENT_DESC> vInputLayoutDesc);
 	bool attachHS(WCHAR* Filename);
 	bool attachDS(WCHAR* Filename);
 	bool attachGS(WCHAR* Filename);
@@ -43,6 +47,7 @@ private:
 };
 
 
+}
 
 }
 

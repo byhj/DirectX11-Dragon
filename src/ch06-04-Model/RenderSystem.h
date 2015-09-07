@@ -1,18 +1,18 @@
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
-#include "d3d/d3dApp.h"
-#include "d3d/d3dFont.h"
-#include "d3d/d3dTimer.h"
-#include "d3d/d3dCamera.h"
-#include "d3d/d3dUtility.h"
+#include "d3d/App.h"
+#include "d3d/Font.h"
+#include "d3d/Timer.h"
+#include "d3d/Camera.h"
+#include "d3d/Utility.h"
 
 #include "Model.h"
 
 namespace byhj
 {
 
-	class RenderSystem : public D3DApp
+	class RenderSystem : public d3d::App
 {
 public:
 	RenderSystem();
@@ -42,10 +42,10 @@ private:
 	void DrawInfo(); 
 
 	byhj::Model m_Model;
-	byhj::D3DFont m_Font;
-	byhj::D3DTimer m_Timer;
-	byhj::D3DCamera m_Camera;
-	byhj::MatrixBuffer m_Matrix;
+	d3d::Font m_Font;
+	d3d::Timer m_Timer;
+	d3d::Camera m_Camera;
+	d3d::MatrixBuffer m_Matrix;
 
 	float fps = 0.0f;
 	int m_videoCardMemory;

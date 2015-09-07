@@ -6,7 +6,7 @@ cbuffer MatrixBuffer : register(b0)
 	float4x4 g_Proj;
 };
 
- struct VS_IN
+struct VS_IN
 {
     float3 Pos   : POSITION;
     float4 Color : COLOR0;

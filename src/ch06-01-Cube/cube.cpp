@@ -1,5 +1,4 @@
 #include "cube.h"
-#include "d3d/d3dUtil.h"
 #include <D3DX11.h>
 
 
@@ -25,7 +24,7 @@ void Cube::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceCon
 
 
 
-void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer matrix)
+void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, d3d::MatrixBuffer matrix)
 {
 
 	pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
@@ -50,8 +49,6 @@ void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, byhj::MatrixBuffer m
 		m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 	}
-
-
 
 }
 

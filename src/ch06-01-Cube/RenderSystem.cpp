@@ -27,12 +27,12 @@ void RenderSystem::v_Render()
 	static float rot = 0.0f;
 	rot +=  m_Timer.GetDeltaTime();
 
-	UpdateScene();
-
 	BeginScene();
 
 	m_Matrix.view = m_Camera.GetViewMatrix();
 	m_Cube.Render(m_pD3D11DeviceContext, m_Matrix);
+
+	DrawInfo();
 
 	EndScene();
 
@@ -48,28 +48,11 @@ void RenderSystem::v_Shutdown()
 }
 
 
-void RenderSystem::UpdateScene()
+void RenderSystem::v_Update()
 {
-	m_Camera.update();
-}
-void  RenderSystem::v_OnMouseDown(WPARAM btnState, int x, int y)
-{
-	m_Camera.OnMouseDown(btnState, x, y, GetHwnd());
+	m_Camera.DetectInput(m_Timer.GetDeltaTime(), GetHwnd());
 }
 
-void  RenderSystem::v_OnMouseMove(WPARAM btnState, int x, int y)
-{
-	m_Camera.OnMouseMove(btnState, x, y);
-}
-
-void  RenderSystem::v_OnMouseUp(WPARAM btnState, int x, int y)
-{
-	m_Camera.OnMouseUp(btnState, x, y);
-}
-void  RenderSystem::v_OnMouseWheel(WPARAM btnState, int x, int y)
-{
-	m_Camera.OnMouseWheel(btnState, x, y, GetAspect());
-}
 void RenderSystem::init_device()
 {
 
@@ -188,6 +171,22 @@ void RenderSystem::init_device()
 
 	///////////////////////////////////////////////////////////////////////////////
 
+	unsigned int numModes, i, numerator, denominator, stringLength;
+	IDXGIFactory* factory;
+	IDXGIAdapter* adapter;
+	IDXGISurface *surface;
+	DXGI_ADAPTER_DESC adapterDesc;
+
+	// Create a DirectX graphics interface factory.
+	CreateDXGIFactory(__uuidof( IDXGIFactory ), ( void** )&factory);
+	// Use the factory to create an adapter for the primary graphics interface (video card).
+	factory->EnumAdapters(0, &adapter);
+	adapter->GetDesc(&adapterDesc);
+	m_videoCardMemory = ( int )( adapterDesc.DedicatedVideoMemory/1024/1024 );
+
+	// Convert the name of the video card to a character array and store it.
+	m_videoCardInfo = std::wstring(L"Video Card  :")+adapterDesc.Description;
+
 }
 
 void RenderSystem::BeginScene()
@@ -237,8 +236,8 @@ void RenderSystem::init_object()
 {
 
 	m_Timer.Reset();
-	m_Camera.SetRadius(5.0f);
-
+	m_Font.Init(m_pD3D11Device);
+	m_Camera.Init(GetAppInst(), GetHwnd());
 	m_Cube.Init(m_pD3D11Device, m_pD3D11DeviceContext, GetHwnd());
 }
 
@@ -246,15 +245,16 @@ void RenderSystem::init_object()
 void RenderSystem::TurnZBufferOn()
 {
 	m_pD3D11DeviceContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
-	return;
+
 }
 
 
 void RenderSystem::TurnZBufferOff()
 {
 	m_pD3D11DeviceContext->OMSetDepthStencilState(m_pDepthDisabledStencilState, 1);
-	return;
+
 }
+
 void RenderSystem::DrawFps()
 {
 	static bool flag = true;

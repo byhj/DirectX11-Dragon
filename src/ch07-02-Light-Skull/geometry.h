@@ -8,11 +8,11 @@
 
 #include "d3d/d3dDebug.h"
 #include "d3d/d3dShader.h"
-#include "d3d/d3dGeometry.h"
+#include "d3d/Geometry.h"
 #include "d3d/d3dLight.h"
-#include "d3d/d3dCamera.h"
-#include "d3d/d3dUtility.h"
-#include "d3d/d3dCamera.h"
+#include "d3d/Camera.h"
+#include "d3d/Utility.h"
+#include "d3d/Camera.h"
 
 namespace byhj
 {
@@ -30,7 +30,7 @@ public:
    }
    ~Geometry() {}
    void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const byhj::MatrixBuffer &matrix, D3DCamera *camera);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DCamera *camera);
 
    void shutdown()
    {
@@ -48,7 +48,7 @@ private:
 		XMFLOAT3 Pos;
 		XMFLOAT3 Normal;
 	};
-	byhj::MatrixBuffer cbMatrix;
+	d3d::MatrixBuffer cbMatrix;
 
 	struct LightBuffer
 	{
