@@ -7,7 +7,7 @@
 #include "d3d/Camera.h"
 #include "d3d/Utility.h"
 
-#include "Geometry.h"
+#include "Object.h"
 
 namespace byhj
 {
@@ -35,7 +35,7 @@ namespace byhj
 		void DrawFps();
 		void DrawInfo();
 
-		byhj::Geometry m_Geometry;
+		byhj::Object m_Object;
 		d3d::Font m_Font;
 		d3d::Timer m_Timer;
 		d3d::Camera m_Camera;

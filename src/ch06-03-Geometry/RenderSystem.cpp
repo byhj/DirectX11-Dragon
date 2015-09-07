@@ -30,7 +30,7 @@ namespace byhj
 		BeginScene();
 
 		m_Matrix.view = m_Camera.GetViewMatrix();
-		m_Geometry.Render(m_pD3D11DeviceContext, m_Matrix);
+		m_Object.Render(m_pD3D11DeviceContext, m_Matrix);
 
 		DrawInfo();
 
@@ -160,7 +160,7 @@ namespace byhj
 		rasterDesc.DepthBias             = 0;
 		rasterDesc.DepthBiasClamp        = 0.0f;
 		rasterDesc.DepthClipEnable       = true;
-		rasterDesc.FillMode              = D3D11_FILL_SOLID;
+		rasterDesc.FillMode              = D3D11_FILL_WIREFRAME;
 		rasterDesc.FrontCounterClockwise = false;
 		rasterDesc.MultisampleEnable     = false;
 		rasterDesc.ScissorEnable         = false;
@@ -238,7 +238,7 @@ namespace byhj
 		m_Timer.Reset();
 		m_Font.Init(m_pD3D11Device);
 		m_Camera.Init(GetAppInst(), GetHwnd());
-		m_Geometry.Init(m_pD3D11Device, m_pD3D11DeviceContext, GetHwnd());
+		m_Object.Init(m_pD3D11Device, m_pD3D11DeviceContext, GetHwnd());
 	}
 
 
