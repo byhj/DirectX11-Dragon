@@ -24,12 +24,17 @@ void Object::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixB
 	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 	pD3D11DeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
+	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	m_pEffectTechnique->GetDesc(&techDesc);
 	for ( UINT p = 0; p<techDesc.Passes; ++p )
 	{
+
+		m_pWorld->SetMatrix(reinterpret_cast<float*>(&cbMatrix.model));
+		m_pView->SetMatrix(reinterpret_cast<float*>(&cbMatrix.view));
+		m_pProj->SetMatrix(reinterpret_cast<float*>(&cbMatrix.proj));
 		m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 	    pD3D11DeviceContext->DrawIndexed(mGridIndexCount, mGridIndexOffset, mGridVertexOffset);
 	    
