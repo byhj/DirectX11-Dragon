@@ -1,7 +1,13 @@
-#ifndef D3DLIGHT_H
-#define D3DLIGHT_H
+#ifndef LIGHT_H
+#define LIGHT_H
 
 #include <xnamath.h>
+
+namespace byhj
+{
+
+namespace d3d
+{
 
 struct DirectionLight 
 {
@@ -52,4 +58,7 @@ struct Material
    XMFLOAT4 Reflect;
 };
 
+}
+
+}
 #endif

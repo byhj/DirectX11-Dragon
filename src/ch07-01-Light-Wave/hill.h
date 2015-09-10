@@ -5,77 +5,61 @@
 
 #include <d3d11.h>
 
-#include "d3d/d3dDebug.h"
-#include "d3d/d3dShader.h"
+#include "d3dx11effect.h"
 #include "d3d/Geometry.h"
-#include "d3d/d3dWave.h"
+#include "d3d/Wave.h"
 #include "d3d/Timer.h"
-
-#include "d3d/d3dLight.h"
-#include "d3d/Camera.h"
 #include "d3d/Utility.h"
+#include "d3d/Light.h"
 
 namespace byhj
 {
 
+
 class Hill 
 {
 public:
-   Hill()
-   {
-	  m_pMVPBuffer    = NULL;
-	  m_pInputLayout  = NULL;
-	  m_VertexCount   = 0;
-	  m_IndexCount    = 0;
-   }
+   Hill()  {}
    ~Hill() {}
 
    void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DTimer *timer, D3DCamera *camera);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Timer *timer);
+   void Shutdown();
 
-   void shutdown()
-   {
-	   ReleaseCOM(m_pMVPBuffer   )
-	   ReleaseCOM(m_pInputLayout )
-   }	
 
     void init_buffer (ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext);
     void init_shader (ID3D11Device *pD3D11Device, HWND hWnd);
-	void init_light();
-
-	XMFLOAT3 GetHillNormal(float x, float z) const;
-	float    GetHillHeight(float x, float z) const;
+	float GetHeight(float x, float z) const;
 
 private:
 	struct  Vertex
 	{
 		XMFLOAT3 Pos;
-		XMFLOAT3 Normal;
+		XMFLOAT4 Color;
 	};
 
 	d3d::MatrixBuffer cbMatrix;
 
-	struct LightBuffer
-	{
-		DirectionLight g_DirLight;
-		PointLight     g_PointLight;
-		SpotLight      g_SpotLight;
-		XMFLOAT3       g_EyePos;
-		float          pad;
-	};
-	LightBuffer cbLight;
+	ID3DX11Effect               *m_pEffect          = nullptr;
+	ID3DX11EffectTechnique      *m_pEffectTechnique = nullptr;
+	ID3DX11EffectMatrixVariable *m_pFxWorld           = nullptr;
+	ID3DX11EffectMatrixVariable *m_pFxView            = nullptr;
+	ID3DX11EffectMatrixVariable *m_pFxProj            = nullptr;
+	ID3DX11EffectVariable       *m_pFxDirLight;
+	ID3DX11EffectVariable       *m_pFxPointLight;
+	ID3DX11EffectVariable       *m_pFxSpotLight;
+	ID3DX11EffectVariable       *m_pFxMaterial;
 
-	Material cbMaterial;
-
-	byhj::Shader CubeShader;
-	ID3D11Buffer        *m_pLandVB;
-	ID3D11Buffer        *m_pLandIB;
-	ID3D11Buffer        *m_pWaveVB;
-	ID3D11Buffer        *m_pWaveIB;
-	ID3D11Buffer        *m_pMVPBuffer;
-	ID3D11Buffer        *m_pLightBuffer;
-	ID3D11Buffer        *m_pMaterialBuffer;
-	ID3D11InputLayout   *m_pInputLayout;
+	ID3D11Buffer        *m_pLandVB      = nullptr;
+	ID3D11Buffer        *m_pLandIB      = nullptr;
+	ID3D11Buffer        *m_pWaveVB      = nullptr;
+	ID3D11Buffer        *m_pWaveIB      = nullptr;
+	ID3D11InputLayout   *m_pInputLayout = nullptr;
+	d3d::DirectionLight m_DirLight;
+	d3d::PointLight     m_PointLight;
+	d3d::SpotLight      m_SpotLight;
+	d3d::Material       m_LandMat;
+	d3d::Material       m_WavesMat;
 
 	std::vector<Vertex>  m_VertexData;
 	std::vector<UINT>    m_IndexData;
@@ -84,14 +68,7 @@ private:
 	int m_IndexCount;
 
 	d3d::Geometry m_Geometry;
-	D3DWave     wave;
-
-	//Light and Material
-	DirectionLight m_DirLight;
-	PointLight     m_PointLight;
-	SpotLight      m_SpotLight;
-	Material       m_LandMat;
-	Material       m_WavesMat;
+	d3d::Wave     m_Wave;
 };
 
 }
