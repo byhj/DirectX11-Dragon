@@ -35,7 +35,7 @@ private:
 	struct  Vertex
 	{
 		XMFLOAT3 Pos;
-		XMFLOAT4 Color;
+		XMFLOAT3 Normal;
 	};
 
 	d3d::MatrixBuffer cbMatrix;

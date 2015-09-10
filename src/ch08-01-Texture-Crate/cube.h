@@ -2,9 +2,10 @@
 #define CUBE_H
 
 #include <vector>
-
 #include <d3d11.h>
 #include <xnamath.h>
+
+#include "d3dx11effect.h"
 #include "d3d/Shader.h"
 #include "d3d/Geometry.h"
 #include "d3d/Light.h"
@@ -17,13 +18,7 @@ namespace byhj
 class Cube
 {
 public:
-   Cube()
-   {
-	  m_pMVPBuffer    = NULL;
-	  m_pInputLayout  = NULL;
-	  m_VertexCount   = 0;
-	  m_IndexCount    = 0;
-   }
+   Cube()  {}
    ~Cube() {}
    void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
    void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Camera *camera);
@@ -64,8 +59,6 @@ private:
 	ID3D11InputLayout        *m_pInputLayout;
 	ID3D11Buffer             *m_pCubeVB;
 	ID3D11Buffer             *m_pCubeIB;     
-	ID3D11Buffer             *m_pLightBuffer;
-	ID3D11Buffer             *m_pMaterialBuffer;
 	ID3D11ShaderResourceView *m_pDiffuseTexSRV;
 
 	d3d::DirectionLight m_DirLights[2];

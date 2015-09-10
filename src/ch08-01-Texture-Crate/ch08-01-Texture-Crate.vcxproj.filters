@@ -14,7 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Framework">
-      <UniqueIdentifier>{b059f67c-44d5-44a3-bfcf-af68c685d411}</UniqueIdentifier>
+      <UniqueIdentifier>{ec9a66ca-2a71-45ae-9249-4365b497b180}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

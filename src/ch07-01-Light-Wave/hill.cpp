@@ -75,7 +75,6 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 	for (UINT i = 0; i < m_Wave.VertexCount(); ++i)
 	{
 		v[i].Pos = m_Wave[i];
-		v[i].Color = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
 	}
 
 	pD3D11DeviceContext->Unmap(m_pWaveVB, 0);
@@ -92,28 +91,34 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
 
-	m_pFxDirLight->SetRawValue(&m_DirLight, 0, sizeof( m_DirLight ) );
-	m_pFxPointLight->SetRawValue(&m_pFxPointLight, 0, sizeof( m_pFxPointLight ));
-	m_pFxSpotLight->SetRawValue(&m_pFxSpotLight, 0, sizeof( m_pFxSpotLight ));
+
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	m_pEffectTechnique->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
-
+		m_pFxDirLight->SetRawValue(&m_DirLight, 0, sizeof( m_DirLight ));
+		m_pFxPointLight->SetRawValue(&m_pFxPointLight, 0, sizeof( m_pFxPointLight ));
+		m_pFxSpotLight->SetRawValue(&m_pFxSpotLight, 0, sizeof( m_pFxSpotLight ));
 		m_pFxWorld->SetMatrix(reinterpret_cast<float*>(&cbMatrix.model));
 		m_pFxView->SetMatrix(reinterpret_cast<float*>(&cbMatrix.view));
 		m_pFxProj->SetMatrix(reinterpret_cast<float*>(&cbMatrix.proj));
 		m_pFxMaterial->SetRawValue(&m_LandMat, 0, sizeof( m_LandMat ));
+
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pLandVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pLandIB, DXGI_FORMAT_R32_UINT, 0);
 		m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+		m_pFxDirLight->SetRawValue(&m_DirLight, 0, sizeof( m_DirLight ));
+		m_pFxPointLight->SetRawValue(&m_pFxPointLight, 0, sizeof( m_pFxPointLight ));
+		m_pFxSpotLight->SetRawValue(&m_pFxSpotLight, 0, sizeof( m_pFxSpotLight ));
 		m_pFxWorld->SetMatrix(reinterpret_cast<float*>(&cbMatrix.model));
 		m_pFxView->SetMatrix(reinterpret_cast<float*>(&cbMatrix.view));
 		m_pFxProj->SetMatrix(reinterpret_cast<float*>(&cbMatrix.proj));
 		m_pFxMaterial->SetRawValue(&m_WavesMat, 0, sizeof( m_WavesMat ));
+
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pWaveVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pWaveIB, DXGI_FORMAT_R32_UINT, 0);
 		
@@ -144,17 +149,7 @@ void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 		XMFLOAT3 p = gridMesh.VertexData[i].Pos;
 		p.y = GetHeight(p.x, p.z);
 		m_VertexData[i].Pos   = p;
-
-		if( p.y < -10.0f )
-			m_VertexData[i].Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
-		else if( p.y < 5.0f )
-			m_VertexData[i].Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		else if( p.y < 12.0f )
-			m_VertexData[i].Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
-		else if( p.y < 20.0f )
-			m_VertexData[i].Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
-		else
-			m_VertexData[i].Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		m_VertexData[i].Normal = gridMesh.VertexData[i].Normal;
 	}
 
 	D3D11_BUFFER_DESC landVBDesc;
@@ -303,7 +298,7 @@ void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	m_pFxDirLight   = m_pEffect->GetVariableByName("g_DirLight");
 	m_pFxPointLight = m_pEffect->GetVariableByName("g_PointLight");
 	m_pFxSpotLight  = m_pEffect->GetVariableByName("g_SpotLight");
-	m_pFxMaterial   = m_pEffect->GetVariableByName("g_Material");
+	m_pFxMaterial   = m_pEffect->GetVariableByName("g_Mat");
 
 	// Done with compiled shader.
 	ReleaseCOM(compiledShader);
@@ -311,7 +306,7 @@ void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	D3DX11_PASS_DESC passDesc;
