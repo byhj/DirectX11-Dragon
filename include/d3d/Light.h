@@ -1,7 +1,9 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include <d3d11.h>
 #include <xnamath.h>
+
 
 namespace byhj
 {

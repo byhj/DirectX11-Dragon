@@ -14,7 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Framework">
-      <UniqueIdentifier>{6d4f9f87-b564-41a9-85cf-11444f803fbf}</UniqueIdentifier>
+      <UniqueIdentifier>{b059f67c-44d5-44a3-bfcf-af68c685d411}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -35,31 +35,31 @@
     <ClCompile Include="cube.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dGeometry.cpp">
+    <ClCompile Include="..\..\include\d3d\App.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dApp.cpp">
+    <ClCompile Include="..\..\include\d3d\Camera.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dCamera.cpp">
+    <ClCompile Include="..\..\include\d3d\Light.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dFont.cpp">
+    <ClCompile Include="..\..\include\d3d\Font.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dShader.cpp">
+    <ClCompile Include="..\..\include\d3d\Geometry.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dTimer.cpp">
+    <ClCompile Include="..\..\include\d3d\Shader.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dUtility.cpp">
+    <ClCompile Include="..\..\include\d3d\Timer.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dUtil.cpp">
+    <ClCompile Include="..\..\include\d3d\Utility.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dWave.cpp">
+    <ClCompile Include="..\..\include\d3d\Wave.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
   </ItemGroup>
@@ -70,35 +70,37 @@
     <ClInclude Include="cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dGeometry.h">
+    <ClInclude Include="..\..\include\d3d\App.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dApp.h">
+    <ClInclude Include="..\..\include\d3d\Camera.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dCamera.h">
+    <ClInclude Include="..\..\include\d3d\Light.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dDebug.h">
+    <ClInclude Include="..\..\include\d3d\Font.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dFont.h">
+    <ClInclude Include="..\..\include\d3d\Geometry.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dShader.h">
+    <ClInclude Include="..\..\include\d3d\Shader.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dTimer.h">
+    <ClInclude Include="..\..\include\d3d\Timer.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dUtility.h">
+    <ClInclude Include="..\..\include\d3d\Utility.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dUtil.h">
+    <ClInclude Include="..\..\include\d3d\Wave.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dWave.h">
-      <Filter>Framework</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="model.fx">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -2,8 +2,8 @@
 #define CUBE_H
 
 #include <vector>
-
 #include <d3d11.h>
+#include <xnamath.h>
 
 #include "d3dx11effect.h"
 #include "d3d/Geometry.h"
@@ -55,6 +55,7 @@ private:
 	ID3D11Buffer        *m_pWaveVB      = nullptr;
 	ID3D11Buffer        *m_pWaveIB      = nullptr;
 	ID3D11InputLayout   *m_pInputLayout = nullptr;
+
 	d3d::DirectionLight m_DirLight;
 	d3d::PointLight     m_PointLight;
 	d3d::SpotLight      m_SpotLight;

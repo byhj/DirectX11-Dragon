@@ -11,7 +11,7 @@ void Cube::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceCon
 	init_texture(pD3D11Device);
 }
 
-void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DCamera *camera)
+void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Camera *camera)
 {
 
 		// Set vertex buffer stride and offset
@@ -112,38 +112,6 @@ void Cube::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	hr = pD3D11Device->CreateBuffer(&cubeIBDesc, &shapeIBO, &m_pCubeIB);
 	DebugHR(hr);
 
-	////////////////////////////////Const Buffer//////////////////////////////////////
-
-	D3D11_BUFFER_DESC mvpDesc;	
-	ZeroMemory(&mvpDesc, sizeof(D3D11_BUFFER_DESC));
-	mvpDesc.Usage          = D3D11_USAGE_DEFAULT;
-	mvpDesc.ByteWidth      = sizeof(MatrixBuffer);
-	mvpDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
-	mvpDesc.CPUAccessFlags = 0;
-	mvpDesc.MiscFlags      = 0;
-	hr = pD3D11Device->CreateBuffer(&mvpDesc, NULL, &m_pMVPBuffer);
-	DebugHR(hr);
-
-
-	D3D11_BUFFER_DESC lightBufferDesc;	
-	ZeroMemory(&lightBufferDesc, sizeof(D3D11_BUFFER_DESC));
-	lightBufferDesc.Usage          = D3D11_USAGE_DEFAULT;
-	lightBufferDesc.ByteWidth      = sizeof(LightBuffer);
-	lightBufferDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
-	lightBufferDesc.CPUAccessFlags = 0;
-	lightBufferDesc.MiscFlags      = 0;
-	hr = pD3D11Device->CreateBuffer(&lightBufferDesc, NULL, &m_pLightBuffer);
-	DebugHR(hr);
-
-	D3D11_BUFFER_DESC matBufferDesc;	
-	ZeroMemory(&matBufferDesc, sizeof(D3D11_BUFFER_DESC));
-	matBufferDesc.Usage          = D3D11_USAGE_DEFAULT;
-	matBufferDesc.ByteWidth      = sizeof(Material);
-	matBufferDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
-	matBufferDesc.CPUAccessFlags = 0;
-	matBufferDesc.MiscFlags      = 0;
-	hr = pD3D11Device->CreateBuffer(&matBufferDesc, NULL, &m_pMaterialBuffer);
-	DebugHR(hr);
 }
 
 void Cube::init_texture(ID3D11Device *pD3D11Device)
