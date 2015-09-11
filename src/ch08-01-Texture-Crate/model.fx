@@ -20,7 +20,7 @@ cbuffer cbPerObject
 }; 
 
 // Nonnumeric values cannot be added to a cbuffer.
-Texture2D gDiffuseMap;
+Texture2D g_DiffuseMap;
 
 SamplerState samAnisotropic
 {
@@ -31,36 +31,35 @@ SamplerState samAnisotropic
 	AddressV = WRAP;
 };
 
-struct VertexIn
+struct VS_IN
 {
-	float3 PosL    : POSITION;
-	float3 NormalL : NORMAL;
+	float3 Pos    : POSITION;
+	float3 Normal : NORMAL;
 	float2 Tex     : TEXCOORD;
 };
 
-struct VertexOut
+struct VS_OUT
 {
-	float4 PosH    : SV_POSITION;
-    float3 PosW    : POSITION;
-    float3 NormalW : NORMAL;
-	float2 Tex     : TEXCOORD;
+	float4 Pos      : SV_POSITION;
+    float3 Normal   : NORMAL;
+	float2 Tex      : TEXCOORD;
+	float3 PosWorld : POSITION;
 };
 
-VertexOut VS(VertexIn vin)
+VS_OUT (VS_IN vs_in)
 {
-	VertexOut vout;
+	VS_OUT vs_out;
 	
-	// Transform to world space space.
-	vout.PosW    = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
-	vout.NormalW = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
+	vs_out.Pos    = mul(float4(vs_in.Pos, 1.0f), g_World).xyz;
+	vs_out.Normal = mul(vs_in.NormalL, (float3x3)g_World);
 		
-	// Transform to homogeneous clip space.
-	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
-	
-	// Output vertex attributes for interpolation across triangle.
-	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
+	vs_out.Pos = mul(float4(vs_in.Pos, 1.0f), g_World);
+	vs_out.Pos = mul(vs_out.Pos, g_View);
+	vs_out.Pos = mul(vs_out.Pos, g_Proj);
 
-	return vout;
+	vs_out.Tex = mul(float4(vs_in.Tex, 0.0f, 1.0f), g_TexTransform).xy;
+
+	return vs_out
 }
  
 float4 PS(VertexOut pin, uniform int gLightCount, uniform bool gUseTexure) : SV_Target
