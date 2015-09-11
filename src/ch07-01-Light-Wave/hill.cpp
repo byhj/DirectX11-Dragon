@@ -9,6 +9,20 @@ float Hill::GetHeight(float x, float z) const
 {
 	return 0.3f * ( z*sinf(0.1f * x) + x*cosf(0.1f * z) );
 }
+XMFLOAT3 Hill::GetHillNormal(float x, float z) const
+{
+	// n = (-df/dx, 1, -df/dz)
+	XMFLOAT3 n(
+		-0.03f*z*cosf(0.1f*x)-0.3f*cosf(0.1f*z),
+		1.0f,
+		-0.3f*sinf(0.1f*x)+0.03f*x*sinf(0.1f*z));
+
+	XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
+	XMStoreFloat3(&n, unitNormal);
+
+	return n;
+}
+
 
 void Hill::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
 {
@@ -28,32 +42,34 @@ static float RandF(float a, float b)
 	return a + RandF() * (b - a);
 }
 
-void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Timer *timer)
+void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Timer *pTimer, d3d::Camera *pCam)
 {
 
 	//
 	// Animate the lights.
 	//
-
-	/*
 	// Circle light over the land surface.
-	m_PointLight.Position.x = 70.0f*cosf(0.2f*mTimer.TotalTime());
-	m_PointLight.Position.z = 70.0f*sinf(0.2f*mTimer.TotalTime());
-	m_PointLight.Position.y = MathHelper::Max(GetHillHeight(m_PointLight.Position.x,
-		m_PointLight.Position.z), -3.0f)+10.0f;
+	m_PointLight.Position.x = 70.0f*cosf(0.2f * pTimer->GetTotalTime());
+	m_PointLight.Position.z = 70.0f*sinf(0.2f * pTimer->GetTotalTime());
+	m_PointLight.Position.y = max(GetHeight(m_PointLight.Position.x, m_PointLight.Position.z), -3.0f)+10.0f;
 
 
 	// The spotlight takes on the camera position and is aimed in the
 	// same direction the camera is looking.  In this way, it looks
 	// like we are holding a flashlight.
-	m_SpotLight.Position = mEyePosW;
+	XMFLOAT4 camPos = pCam->GetCamPos();
+	m_EyePos =  XMFLOAT3(camPos.x, camPos.y, camPos.z);
+	XMVECTOR pos    = XMVectorSet(camPos.x, camPos.y, camPos.z, 0.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	m_SpotLight.Position = m_EyePos;
 	XMStoreFloat3(&m_SpotLight.Direction, XMVector3Normalize(target-pos));
 
-	*/
+
 	// Every quarter second, generate a random wave.
 
 	static float t_base = 0.0f;
-	if ((timer->GetTotalTime() - t_base) >= 0.25f)
+	if ((pTimer->GetTotalTime() - t_base) >= 0.25f)
 	{
 		t_base += 0.25f;
 
@@ -64,7 +80,7 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 		m_Wave.Disturb(i, j, r);
 	}
 
-	m_Wave.Update(timer->GetDeltaTime());
+	m_Wave.Update(pTimer->GetDeltaTime());
 
 	// Update the wave vertex buffer with the new solution.
 
@@ -91,18 +107,18 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
 
-
+	m_pFxDirLight->SetRawValue(&m_DirLight, 0, sizeof( m_DirLight ));
+	m_pFxPointLight->SetRawValue(&m_PointLight, 0, sizeof( m_PointLight ));
+	m_pFxSpotLight->SetRawValue(&m_SpotLight, 0, sizeof( m_SpotLight ));
+	m_pFxWorld->SetMatrix(reinterpret_cast< float* >( &cbMatrix.model ));
+	m_pFxView->SetMatrix(reinterpret_cast< float* >( &cbMatrix.view ));
+	m_pFxProj->SetMatrix(reinterpret_cast< float* >( &cbMatrix.proj ));
 
 	D3DX11_TECHNIQUE_DESC techDesc;
 	m_pEffectTechnique->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
-		m_pFxDirLight->SetRawValue(&m_DirLight, 0, sizeof( m_DirLight ));
-		m_pFxPointLight->SetRawValue(&m_pFxPointLight, 0, sizeof( m_pFxPointLight ));
-		m_pFxSpotLight->SetRawValue(&m_pFxSpotLight, 0, sizeof( m_pFxSpotLight ));
-		m_pFxWorld->SetMatrix(reinterpret_cast<float*>(&cbMatrix.model));
-		m_pFxView->SetMatrix(reinterpret_cast<float*>(&cbMatrix.view));
-		m_pFxProj->SetMatrix(reinterpret_cast<float*>(&cbMatrix.proj));
+
 		m_pFxMaterial->SetRawValue(&m_LandMat, 0, sizeof( m_LandMat ));
 
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pLandVB, &stride, &offset);
@@ -111,17 +127,11 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-		m_pFxDirLight->SetRawValue(&m_DirLight, 0, sizeof( m_DirLight ));
-		m_pFxPointLight->SetRawValue(&m_pFxPointLight, 0, sizeof( m_pFxPointLight ));
-		m_pFxSpotLight->SetRawValue(&m_pFxSpotLight, 0, sizeof( m_pFxSpotLight ));
-		m_pFxWorld->SetMatrix(reinterpret_cast<float*>(&cbMatrix.model));
-		m_pFxView->SetMatrix(reinterpret_cast<float*>(&cbMatrix.view));
-		m_pFxProj->SetMatrix(reinterpret_cast<float*>(&cbMatrix.proj));
+
 		m_pFxMaterial->SetRawValue(&m_WavesMat, 0, sizeof( m_WavesMat ));
 
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pWaveVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pWaveIB, DXGI_FORMAT_R32_UINT, 0);
-		
 		m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(3 * m_Wave.TriangleCount(), 0, 0);
 	}
@@ -149,7 +159,7 @@ void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 		XMFLOAT3 p = gridMesh.VertexData[i].Pos;
 		p.y = GetHeight(p.x, p.z);
 		m_VertexData[i].Pos   = p;
-		m_VertexData[i].Normal = gridMesh.VertexData[i].Normal;
+		m_VertexData[i].Normal = GetHillNormal(p.x, p.z);
 	}
 
 	D3D11_BUFFER_DESC landVBDesc;

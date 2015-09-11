@@ -6,13 +6,10 @@
 #include <d3d11.h>
 #include <xnamath.h>
 
-#include "d3d/d3dDebug.h"
-#include "d3d/d3dShader.h"
 #include "d3d/Geometry.h"
-#include "d3d/d3dLight.h"
+#include "d3d/Light.h"
 #include "d3d/Camera.h"
 #include "d3d/Utility.h"
-#include "d3d/Camera.h"
 
 namespace byhj
 {
@@ -20,14 +17,7 @@ namespace byhj
 class Geometry
 {
 public:
-   Geometry()
-   {
-	  m_pMVPBuffer    = NULL;
-	  m_pInputLayout  = NULL;
-	  m_VertexCount   = 0;
-	  m_IndexCount    = 0;
-	  mLightCount     = 0;
-   }
+   Geometry()   {}
    ~Geometry() {}
    void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
    void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DCamera *camera);
@@ -52,15 +42,13 @@ private:
 
 	struct LightBuffer
 	{
-		DirectionLight g_DirLight;
+		d3d::DirectionLight g_DirLight;
 		XMFLOAT3       g_EyePos;
 		float          pad;
 	};
 	LightBuffer cbLight;
 
 	Material cbMaterial;
-
-	byhj::Shader CubeShader;
 
 	ID3D11Buffer        *m_pMVPBuffer;
 	ID3D11InputLayout   *m_pInputLayout;
@@ -71,12 +59,12 @@ private:
 	ID3D11Buffer        *m_pLightBuffer;
 	ID3D11Buffer        *m_pMaterialBuffer;
 
-	DirectionLight m_DirLights[3];
-	Material m_GridMat;
-	Material m_BoxMat;
-	Material m_CylinderMat;
-	Material m_SphereMat;
-	Material m_SkullMat;
+	d3d::DirectionLight m_DirLights[3];
+	d3d::Material m_GridMat;
+	d3d::Material m_BoxMat;
+	d3d::Material m_CylinderMat;
+	d3d::Material m_SphereMat;
+	d3d::Material m_SkullMat;
 	std::vector<Vertex>  m_VertexData;
 	std::vector<UINT>    m_IndexData;
 

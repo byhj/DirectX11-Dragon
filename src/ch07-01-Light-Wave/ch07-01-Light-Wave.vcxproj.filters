@@ -100,7 +100,10 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="wave.fx">
-      <Filter>Header Files</Filter>
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="lightHelper.fx">
+      <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

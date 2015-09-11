@@ -11,6 +11,7 @@
 #include "d3d/Timer.h"
 #include "d3d/Utility.h"
 #include "d3d/Light.h"
+#include "d3d/Camera.h"
 
 namespace byhj
 {
@@ -23,13 +24,14 @@ public:
    ~Hill() {}
 
    void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Timer *timer);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Timer *timer, d3d::Camera *pCam);
    void Shutdown();
 
 
     void init_buffer (ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext);
     void init_shader (ID3D11Device *pD3D11Device, HWND hWnd);
 	float GetHeight(float x, float z) const;
+	XMFLOAT3 GetHillNormal(float x, float z)const;
 
 private:
 	struct  Vertex
@@ -42,13 +44,13 @@ private:
 
 	ID3DX11Effect               *m_pEffect          = nullptr;
 	ID3DX11EffectTechnique      *m_pEffectTechnique = nullptr;
-	ID3DX11EffectMatrixVariable *m_pFxWorld           = nullptr;
-	ID3DX11EffectMatrixVariable *m_pFxView            = nullptr;
-	ID3DX11EffectMatrixVariable *m_pFxProj            = nullptr;
-	ID3DX11EffectVariable       *m_pFxDirLight;
-	ID3DX11EffectVariable       *m_pFxPointLight;
-	ID3DX11EffectVariable       *m_pFxSpotLight;
-	ID3DX11EffectVariable       *m_pFxMaterial;
+	ID3DX11EffectMatrixVariable *m_pFxWorld         = nullptr;
+	ID3DX11EffectMatrixVariable *m_pFxView          = nullptr;
+	ID3DX11EffectMatrixVariable *m_pFxProj          = nullptr;
+	ID3DX11EffectVariable       *m_pFxDirLight      = nullptr;
+	ID3DX11EffectVariable       *m_pFxPointLight    = nullptr;
+	ID3DX11EffectVariable       *m_pFxSpotLight     = nullptr;
+	ID3DX11EffectVariable       *m_pFxMaterial      = nullptr;
 
 	ID3D11Buffer        *m_pLandVB      = nullptr;
 	ID3D11Buffer        *m_pLandIB      = nullptr;
@@ -61,7 +63,7 @@ private:
 	d3d::SpotLight      m_SpotLight;
 	d3d::Material       m_LandMat;
 	d3d::Material       m_WavesMat;
-
+	XMFLOAT3  m_EyePos;
 	std::vector<Vertex>  m_VertexData;
 	std::vector<UINT>    m_IndexData;
 

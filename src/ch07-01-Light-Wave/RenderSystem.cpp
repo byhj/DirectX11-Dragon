@@ -30,7 +30,7 @@ namespace byhj
 		BeginScene();
 
 		m_Matrix.view = m_Camera.GetViewMatrix();
-		m_Hill.Render(m_pD3D11DeviceContext, m_Matrix, &m_Timer);
+		m_Hill.Render(m_pD3D11DeviceContext, m_Matrix, &m_Timer, &m_Camera);
 
 		DrawInfo();
 
