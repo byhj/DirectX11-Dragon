@@ -31,47 +31,53 @@ void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBu
 
 	if (GetAsyncKeyState('3') & 0x8000)
 		mLightCount = 3;
+	m_EffectHelper.Render(pD3D11DeviceContext);
+	pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	XMMATRIX world;
 	cbMatrix.model = matrix.model;
 	cbMatrix.view  = matrix.view;
 	cbMatrix.proj  = matrix.proj;
-	m_EffectHelper.SetWorld(matrix.model);
-	m_EffectHelper.SetView(matrix.view);
-	m_EffectHelper.SetProj(matrix.proj);
+
+	m_EffectHelper.SetWorld(cbMatrix.model);
+	m_EffectHelper.SetView(cbMatrix.view);
+	m_EffectHelper.SetProj(cbMatrix.proj);
 
 	cbLight.g_DirLight   = m_DirLights[mLightCount];
 	cbLight.g_EyePos     = camera->GetCamPos();
 	m_EffectHelper.SetDirLight(cbLight.g_DirLight);
 	m_EffectHelper.SetEyePos(cbLight.g_EyePos);
 
+
 	D3DX11_TECHNIQUE_DESC techDesc;
 	ID3DX11EffectTechnique* activeTech = m_EffectHelper.GetEffectTech();
 	activeTech->GetDesc(&techDesc);
 	for ( UINT p = 0; p<techDesc.Passes; ++p )
 	{
-
 		// Set vertex buffer stride and offset
 		unsigned int stride;
 		unsigned int offset;
 		stride = sizeof( Vertex );
 		offset = 0;
 
+		
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pShapesVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pShapesIB, DXGI_FORMAT_R32_UINT, 0);
 
 		// Draw the grid.
 		world = XMLoadFloat4x4(&mGridWorld);
-		XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+		XMStoreFloat4x4(&cbMatrix.model, world);
 		m_EffectHelper.SetWorld(cbMatrix.model);
 		m_EffectHelper.SetMaterial(m_GridMat);
+		activeTech->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(mGridIndexCount, mGridIndexOffset, mGridVertexOffset);
 
 		// Draw the box.
 		world = XMLoadFloat4x4(&mBoxWorld);
-		XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+		XMStoreFloat4x4(&cbMatrix.model, world);
 		m_EffectHelper.SetWorld(cbMatrix.model);
 		m_EffectHelper.SetMaterial(m_BoxMat);
+		activeTech->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
 
 
@@ -80,8 +86,9 @@ void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBu
 		for ( int i = 0; i<10; ++i )
 		{
 			world = XMLoadFloat4x4(&mCylWorld[i]);
-			XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+			XMStoreFloat4x4(&cbMatrix.model, world);
 			m_EffectHelper.SetWorld(cbMatrix.model);
+			activeTech->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 			pD3D11DeviceContext->DrawIndexed(mCylinderIndexCount, mCylinderIndexOffset, mCylinderVertexOffset);
 		}
 
@@ -90,19 +97,23 @@ void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBu
 		for ( int i = 0; i<10; ++i )
 		{
 			world = XMLoadFloat4x4(&mSphereWorld[i]);
-			XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+			XMStoreFloat4x4(&cbMatrix.model, world);
 			m_EffectHelper.SetWorld(cbMatrix.model);
+			activeTech->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 			pD3D11DeviceContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
 		}
+
 
 		//Draw the skull
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pSkullVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pSkullIB, DXGI_FORMAT_R32_UINT, 0);
 		world = XMLoadFloat4x4(&mSkullWorld);
-		XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+		XMStoreFloat4x4(&cbMatrix.model, world);
 		m_EffectHelper.SetWorld(cbMatrix.model);
 		m_EffectHelper.SetMaterial(m_SkullMat);
-		pD3D11DeviceContext->DrawIndexed(mSkullIndexCount, 0, 0);
+		activeTech->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
+		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+		
 	}
 
 }

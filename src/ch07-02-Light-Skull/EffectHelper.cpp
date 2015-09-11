@@ -68,9 +68,9 @@ void EffectHelper::Init(ID3D11Device *pD3D11Device)
 		passDesc.IAInputSignatureSize, &m_pInputLayout);
 }
 
-void EffectHelper::Render()
+void EffectHelper::Render(ID3D11DeviceContext *pD3D11DeviceContext)
 {
- 
+	pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
 }
 
 void EffectHelper::Shutdown()
@@ -78,45 +78,45 @@ void EffectHelper::Shutdown()
 	ReleaseCOM(m_pEffect);
 }
 
-void EffectHelper::SetEyePos(const XMFLOAT4 &eyePos)
+void EffectHelper::SetEyePos( XMFLOAT4 &eyePos)
 {
 	m_pFxEyePos->SetRawValue(&eyePos, 0, sizeof( XMFLOAT4 ));
 }
 
-void EffectHelper::SetDirLight(const d3d::DirectionLight &dirLight)
+void EffectHelper::SetDirLight( d3d::DirectionLight &dirLight)
 {
 	m_pFxDirLight->SetRawValue(&dirLight, 0, sizeof( dirLight ));
 }
 
-void EffectHelper::SetMaterial(const d3d::Material &mat)
+void EffectHelper::SetMaterial( d3d::Material &mat)
 {
 	m_pFxMaterial->SetRawValue(&mat, 0, sizeof( mat ) ) ;
 }
 
-void EffectHelper::SetPointLight(const d3d::PointLight &pointLight)
+void EffectHelper::SetPointLight( d3d::PointLight &pointLight)
 {
 
 }
 
-void EffectHelper::SetSpotLight(const d3d::SpotLight &spotLight)
+void EffectHelper::SetSpotLight( d3d::SpotLight &spotLight)
 {
 
 }
 
 void EffectHelper::SetWorld(XMFLOAT4X4 World)
 {
-	m_pFxWorld->SetMatrix(reinterpret_cast< const float* >( &World ));
+	m_pFxWorld->SetMatrix(reinterpret_cast<  float* >( &World ));
 }
 
 void EffectHelper::SetView(XMFLOAT4X4 View)
 {
-	m_pFxView->SetMatrix(reinterpret_cast< const float* >( &View ));
+	m_pFxView->SetMatrix(reinterpret_cast<  float* >( &View ));
 
 }
 
 void EffectHelper::SetProj(XMFLOAT4X4 Proj)
 {
-	m_pFxProj->SetMatrix(reinterpret_cast< const float* >( &Proj ));
+	m_pFxProj->SetMatrix(reinterpret_cast<  float* >( &Proj ));
 
 }
 

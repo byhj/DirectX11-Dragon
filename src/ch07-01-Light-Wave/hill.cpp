@@ -110,6 +110,7 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 	m_pFxDirLight->SetRawValue(&m_DirLight, 0, sizeof( m_DirLight ));
 	m_pFxPointLight->SetRawValue(&m_PointLight, 0, sizeof( m_PointLight ));
 	m_pFxSpotLight->SetRawValue(&m_SpotLight, 0, sizeof( m_SpotLight ));
+	m_pFxEyePos->SetRawValue(&m_EyePos, 0, sizeof( m_EyePos ));
 	m_pFxWorld->SetMatrix(reinterpret_cast< float* >( &cbMatrix.model ));
 	m_pFxView->SetMatrix(reinterpret_cast< float* >( &cbMatrix.view ));
 	m_pFxProj->SetMatrix(reinterpret_cast< float* >( &cbMatrix.proj ));
@@ -305,6 +306,7 @@ void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	m_pFxWorld      = m_pEffect->GetVariableByName("g_World")->AsMatrix();
 	m_pFxView       = m_pEffect->GetVariableByName("g_View")->AsMatrix();
 	m_pFxProj       = m_pEffect->GetVariableByName("g_Proj")->AsMatrix();
+	m_pFxEyePos     = m_pEffect->GetVariableByName("g_EyePos")->AsVector();
 	m_pFxDirLight   = m_pEffect->GetVariableByName("g_DirLight");
 	m_pFxPointLight = m_pEffect->GetVariableByName("g_PointLight");
 	m_pFxSpotLight  = m_pEffect->GetVariableByName("g_SpotLight");

@@ -90,7 +90,7 @@ private:
 	XMFLOAT4X4 mSkullWorld;
 
 	UINT mSkullIndexCount;
-	UINT mLightCount;
+	UINT mLightCount = 0;
 };
 
 }

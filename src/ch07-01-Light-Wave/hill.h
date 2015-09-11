@@ -47,6 +47,7 @@ private:
 	ID3DX11EffectMatrixVariable *m_pFxWorld         = nullptr;
 	ID3DX11EffectMatrixVariable *m_pFxView          = nullptr;
 	ID3DX11EffectMatrixVariable *m_pFxProj          = nullptr;
+	ID3DX11EffectVectorVariable *m_pFxEyePos;
 	ID3DX11EffectVariable       *m_pFxDirLight      = nullptr;
 	ID3DX11EffectVariable       *m_pFxPointLight    = nullptr;
 	ID3DX11EffectVariable       *m_pFxSpotLight     = nullptr;
