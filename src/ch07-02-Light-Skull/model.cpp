@@ -1,17 +1,21 @@
-#include "Geometry.h"
-
+#include "Model.h"
+#include <iostream>
+#include <fstream>
+#include <string>
 
 namespace byhj
 {
 
 
-void Geometry::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
+void Model::Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd)
 {
 	init_buffer(pD3D11Device, pD3D11DeviceContext);
 	init_shader(pD3D11Device, hWnd);
+	m_EffectHelper.Init(pD3D11Device);
+
 }
 
-void Geometry::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DCamera *camera)
+void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Camera *camera)
 {
 		//
 	// Switch the number of lights based on key presses.
@@ -29,83 +33,82 @@ void Geometry::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::Matri
 		mLightCount = 3;
 
 	XMMATRIX world;
-	world = XMLoadFloat4x4(&mSkullWorld);
 	cbMatrix.model = matrix.model;
 	cbMatrix.view  = matrix.view;
 	cbMatrix.proj  = matrix.proj;
-	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
-	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
+	m_EffectHelper.SetWorld(matrix.model);
+	m_EffectHelper.SetView(matrix.view);
+	m_EffectHelper.SetProj(matrix.proj);
 
 	cbLight.g_DirLight   = m_DirLights[mLightCount];
-	cbLight.g_EyePos     = camera->GetPos();
-	pD3D11DeviceContext->UpdateSubresource(m_pLightBuffer, 0, NULL, &cbLight, 0, 0);
-	pD3D11DeviceContext->PSSetConstantBuffers(0, 1, &m_pLightBuffer);
+	cbLight.g_EyePos     = camera->GetCamPos();
+	m_EffectHelper.SetDirLight(cbLight.g_DirLight);
+	m_EffectHelper.SetEyePos(cbLight.g_EyePos);
 
-	CubeShader.use(pD3D11DeviceContext);
-	// Set vertex buffer stride and offset
-	unsigned int stride;
-	unsigned int offset;
-	stride = sizeof(Vertex);
-	offset = 0;
-	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pSkullVB, &stride, &offset);
-	pD3D11DeviceContext->IASetIndexBuffer(m_pSkullIB, DXGI_FORMAT_R32_UINT, 0);
-	cbMaterial = m_SkullMat;
-	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
-	pD3D11DeviceContext->PSSetConstantBuffers(1, 1, &m_pMaterialBuffer);
-	pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
-
-
-	//////////////////////////////Draw the Shade//////////////////////////
-	pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pShapesVB, &stride, &offset);
-	pD3D11DeviceContext->IASetIndexBuffer(m_pShapesIB, DXGI_FORMAT_R32_UINT, 0);
-
-	// Draw the grid.
-	world = XMLoadFloat4x4(&mGridWorld);
-	XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world) );
-	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
-	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
-	cbMaterial = m_GridMat;
-	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
-	pD3D11DeviceContext->DrawIndexed(mGridIndexCount, mGridIndexOffset, mGridVertexOffset);
-
-	// Draw the box.
-	world = XMLoadFloat4x4(&mBoxWorld);
-	XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
-	pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
-	pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
-	cbMaterial = m_BoxMat;
-	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
-	pD3D11DeviceContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
-
-
-	// Draw the cylinders.
-	cbMaterial = m_CylinderMat;
-	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
-	for (int i = 0; i < 10; ++i)
+	D3DX11_TECHNIQUE_DESC techDesc;
+	ID3DX11EffectTechnique* activeTech = m_EffectHelper.GetEffectTech();
+	activeTech->GetDesc(&techDesc);
+	for ( UINT p = 0; p<techDesc.Passes; ++p )
 	{
-		world = XMLoadFloat4x4(&mCylWorld[i]);
-	    XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world) );
-		pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
-		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
-		pD3D11DeviceContext->DrawIndexed(mCylinderIndexCount, mCylinderIndexOffset, mCylinderVertexOffset);
-	}
 
-	// Draw the spheres.
-	cbMaterial = m_SphereMat;
-	pD3D11DeviceContext->UpdateSubresource(m_pMaterialBuffer, 0, NULL, &cbMaterial, 0, 0);
-	for (int i = 0; i < 10; ++i)
-	{
-		world = XMLoadFloat4x4(&mSphereWorld[i]);
+		// Set vertex buffer stride and offset
+		unsigned int stride;
+		unsigned int offset;
+		stride = sizeof( Vertex );
+		offset = 0;
+
+		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pShapesVB, &stride, &offset);
+		pD3D11DeviceContext->IASetIndexBuffer(m_pShapesIB, DXGI_FORMAT_R32_UINT, 0);
+
+		// Draw the grid.
+		world = XMLoadFloat4x4(&mGridWorld);
 		XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
-		pD3D11DeviceContext->UpdateSubresource(m_pMVPBuffer, 0, NULL, &cbMatrix, 0, 0);
-		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &m_pMVPBuffer);
-		pD3D11DeviceContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
+		m_EffectHelper.SetWorld(cbMatrix.model);
+		m_EffectHelper.SetMaterial(m_GridMat);
+		pD3D11DeviceContext->DrawIndexed(mGridIndexCount, mGridIndexOffset, mGridVertexOffset);
+
+		// Draw the box.
+		world = XMLoadFloat4x4(&mBoxWorld);
+		XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+		m_EffectHelper.SetWorld(cbMatrix.model);
+		m_EffectHelper.SetMaterial(m_BoxMat);
+		pD3D11DeviceContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
+
+
+		// Draw the cylinders.
+		m_EffectHelper.SetMaterial(m_CylinderMat);
+		for ( int i = 0; i<10; ++i )
+		{
+			world = XMLoadFloat4x4(&mCylWorld[i]);
+			XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+			m_EffectHelper.SetWorld(cbMatrix.model);
+			pD3D11DeviceContext->DrawIndexed(mCylinderIndexCount, mCylinderIndexOffset, mCylinderVertexOffset);
+		}
+
+		// Draw the spheres.
+		m_EffectHelper.SetMaterial(m_SphereMat);
+		for ( int i = 0; i<10; ++i )
+		{
+			world = XMLoadFloat4x4(&mSphereWorld[i]);
+			XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+			m_EffectHelper.SetWorld(cbMatrix.model);
+			pD3D11DeviceContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
+		}
+
+		//Draw the skull
+		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pSkullVB, &stride, &offset);
+		pD3D11DeviceContext->IASetIndexBuffer(m_pSkullIB, DXGI_FORMAT_R32_UINT, 0);
+		world = XMLoadFloat4x4(&mSkullWorld);
+		XMStoreFloat4x4(&cbMatrix.model, XMMatrixTranspose(world));
+		m_EffectHelper.SetWorld(cbMatrix.model);
+		m_EffectHelper.SetMaterial(m_SkullMat);
+		pD3D11DeviceContext->DrawIndexed(mSkullIndexCount, 0, 0);
 	}
 
 }
 
 
-void Geometry::init_light()
+void Model::init_light()
 {
 	m_DirLights[0].Ambient   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	m_DirLights[0].Diffuse   = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -144,7 +147,7 @@ void Geometry::init_light()
 }
 
 
-void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
+void Model::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext)
 {	
 	init_light();
 
@@ -330,64 +333,13 @@ void Geometry::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D
 	DebugHR(hr);
 	////////////////////////////////Const Buffer//////////////////////////////////////
 
-	D3D11_BUFFER_DESC mvpDesc;	
-	ZeroMemory(&mvpDesc, sizeof(D3D11_BUFFER_DESC));
-	mvpDesc.Usage          = D3D11_USAGE_DEFAULT;
-	mvpDesc.ByteWidth      = sizeof(MatrixBuffer);
-	mvpDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
-	mvpDesc.CPUAccessFlags = 0;
-	mvpDesc.MiscFlags      = 0;
-	hr = pD3D11Device->CreateBuffer(&mvpDesc, NULL, &m_pMVPBuffer);
-	DebugHR(hr);
 
-
-	D3D11_BUFFER_DESC lightBufferDesc;	
-	ZeroMemory(&lightBufferDesc, sizeof(D3D11_BUFFER_DESC));
-	lightBufferDesc.Usage          = D3D11_USAGE_DEFAULT;
-	lightBufferDesc.ByteWidth      = sizeof(LightBuffer);
-	lightBufferDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
-	lightBufferDesc.CPUAccessFlags = 0;
-	lightBufferDesc.MiscFlags      = 0;
-	hr = pD3D11Device->CreateBuffer(&lightBufferDesc, NULL, &m_pLightBuffer);
-	DebugHR(hr);
-
-	D3D11_BUFFER_DESC matBufferDesc;	
-	ZeroMemory(&matBufferDesc, sizeof(D3D11_BUFFER_DESC));
-	matBufferDesc.Usage          = D3D11_USAGE_DEFAULT;
-	matBufferDesc.ByteWidth      = sizeof(Material);
-	matBufferDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
-	matBufferDesc.CPUAccessFlags = 0;
-	matBufferDesc.MiscFlags      = 0;
-	hr = pD3D11Device->CreateBuffer(&matBufferDesc, NULL, &m_pMaterialBuffer);
-	DebugHR(hr);
 }
 
 
-void Geometry::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
+void Model::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 {
-	D3D11_INPUT_ELEMENT_DESC pInputLayoutDesc[2];
-	pInputLayoutDesc[0].SemanticName         = "POSITION";
-	pInputLayoutDesc[0].SemanticIndex        = 0;
-	pInputLayoutDesc[0].Format               = DXGI_FORMAT_R32G32B32_FLOAT;
-	pInputLayoutDesc[0].InputSlot            = 0;
-	pInputLayoutDesc[0].AlignedByteOffset    = 0;
-	pInputLayoutDesc[0].InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
-	pInputLayoutDesc[0].InstanceDataStepRate = 0;
 
-	pInputLayoutDesc[1].SemanticName         = "NORMAL";
-	pInputLayoutDesc[1].SemanticIndex        = 0;
-	pInputLayoutDesc[1].Format               = DXGI_FORMAT_R32G32B32_FLOAT;
-	pInputLayoutDesc[1].InputSlot            = 0;
-	pInputLayoutDesc[1].AlignedByteOffset    = 12;
-	pInputLayoutDesc[1].InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
-	pInputLayoutDesc[1].InstanceDataStepRate = 0;
-
-	unsigned numElements = ARRAYSIZE(pInputLayoutDesc);
-
-	CubeShader.init(pD3D11Device, hWnd);
-	CubeShader.attachVS(L"model.vsh", pInputLayoutDesc, numElements);
-	CubeShader.attachPS(L"model.psh");
-	CubeShader.end();
 }
 
 

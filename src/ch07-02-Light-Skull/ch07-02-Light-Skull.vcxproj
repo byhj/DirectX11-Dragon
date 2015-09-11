@@ -44,6 +44,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>D:\software\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -72,7 +73,8 @@
     <ClInclude Include="..\..\include\d3d\Timer.h" />
     <ClInclude Include="..\..\include\d3d\Utility.h" />
     <ClInclude Include="..\..\include\d3d\Wave.h" />
-    <ClInclude Include="geometry.h" />
+    <ClInclude Include="EffectHelper.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="RenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
@@ -90,10 +92,14 @@
     <ClCompile Include="..\..\include\d3d\Utility.cpp" />
     <ClCompile Include="..\..\include\d3d\Wave.cpp" />
     <ClCompile Include="ch07-02-Light-Skull.cpp" />
-    <ClCompile Include="geometry.cpp" />
+    <ClCompile Include="EffectHelper.cpp" />
+    <ClCompile Include="model.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="lightHelper.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="model.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>

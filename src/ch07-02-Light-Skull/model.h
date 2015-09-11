@@ -1,31 +1,31 @@
-#ifndef CUBE_H
-#define CUBE_H
+#ifndef MODEL_H
+#define MODEL_H
 
 #include <vector>
 
 #include <d3d11.h>
 #include <xnamath.h>
 
+#include "d3dx11effect.h"
 #include "d3d/Geometry.h"
 #include "d3d/Light.h"
 #include "d3d/Camera.h"
 #include "d3d/Utility.h"
+#include "EffectHelper.h"
 
 namespace byhj
 {
 
-class Geometry
+class Model
 {
 public:
-   Geometry()   {}
-   ~Geometry() {}
+   Model()   {}
+   ~Model() {}
    void Init(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext, HWND hWnd);
-   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, D3DCamera *camera);
+   void Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuffer &matrix, d3d::Camera *pCamera);
 
-   void shutdown()
+   void Shutdown()
    {
-	   ReleaseCOM(m_pMVPBuffer         )
-	   ReleaseCOM(m_pInputLayout       )
    }	
 
     void init_buffer (ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11DeviceContext);
@@ -43,21 +43,14 @@ private:
 	struct LightBuffer
 	{
 		d3d::DirectionLight g_DirLight;
-		XMFLOAT3       g_EyePos;
-		float          pad;
+		XMFLOAT4       g_EyePos;
 	};
 	LightBuffer cbLight;
 
-	Material cbMaterial;
-
-	ID3D11Buffer        *m_pMVPBuffer;
-	ID3D11InputLayout   *m_pInputLayout;
 	ID3D11Buffer        *m_pShapesVB;
 	ID3D11Buffer        *m_pShapesIB;     
 	ID3D11Buffer        *m_pSkullVB;
 	ID3D11Buffer        *m_pSkullIB;
-	ID3D11Buffer        *m_pLightBuffer;
-	ID3D11Buffer        *m_pMaterialBuffer;
 
 	d3d::DirectionLight m_DirLights[3];
 	d3d::Material m_GridMat;
@@ -65,6 +58,9 @@ private:
 	d3d::Material m_CylinderMat;
 	d3d::Material m_SphereMat;
 	d3d::Material m_SkullMat;
+
+	EffectHelper m_EffectHelper;
+
 	std::vector<Vertex>  m_VertexData;
 	std::vector<UINT>    m_IndexData;
 

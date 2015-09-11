@@ -51,7 +51,7 @@ private:
 	};
 	LightBuffer cbLight;
 
-	d3d::Material cbMaterial;
+	d3d::Material 	m_EffectHelper.SetMaterial(m_GridMat); cbMaterial;
 
 	d3d::Shader CubeShader;
 

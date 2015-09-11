@@ -18,9 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,6 +48,12 @@
     <ClInclude Include="..\..\include\d3d\Wave.h">
       <Filter>Framework</Filter>
     </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="model.psh">
@@ -63,9 +66,6 @@
   <ItemGroup>
     <ClCompile Include="ch07-02-Light-Skull.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="geometry.cpp">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderSystem.cpp">
       <Filter>Header Files</Filter>
@@ -97,9 +97,18 @@
     <ClCompile Include="..\..\include\d3d\Wave.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectHelper.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="model.fx">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="lightHelper.fx">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>
