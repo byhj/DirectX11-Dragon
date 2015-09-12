@@ -53,14 +53,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="wave.psh">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="wave.vsh">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="ch08-02-Texture-Hill.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,5 +89,13 @@
     <ClCompile Include="..\..\include\d3d\Wave.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="wave.fx">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="lightHelper.fx">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

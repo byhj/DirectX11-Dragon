@@ -44,6 +44,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>D:\Software\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -76,10 +77,6 @@
     <ClInclude Include="RenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="wave.psh" />
-    <None Include="wave.vsh" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\include\d3d\App.cpp" />
     <ClCompile Include="..\..\include\d3d\Camera.cpp" />
     <ClCompile Include="..\..\include\d3d\Font.cpp" />
@@ -92,6 +89,14 @@
     <ClCompile Include="ch08-02-Texture-Hill.cpp" />
     <ClCompile Include="hill.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="lightHelper.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="wave.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,30 +36,18 @@ namespace byhj
 			XMFLOAT3 Normal;
 			XMFLOAT2 Tex;
 		};
-		d3d::MatrixBuffer cbMatrix;
-
-		struct LightBuffer
-		{
-			d3d::DirectionLight g_DirLights[2];
-			XMFLOAT3       g_EyePos;
-			float          pad;
-		};
-		LightBuffer cbLight;
-
-		d3d::Material cbMaterial;
-		d3d::DirectionLight m_DirLights[2];
-		d3d::Material m_CubeMat;
 
 		ID3DX11Effect               *m_pEffect          = nullptr;
 		ID3DX11EffectTechnique      *m_pEffectTechnique = nullptr;
-		ID3DX11EffectMatrixVariable *m_pWorld           = nullptr;
-		ID3DX11EffectMatrixVariable *m_pView            = nullptr;
-		ID3DX11EffectMatrixVariable *m_pProj            = nullptr;
-		ID3DX11EffectShaderResourceVariable * m_pFxDiffuseMap;
-		ID3D11Buffer                *m_pCubeVB = nullptr;
-		ID3D11Buffer                *m_pCubeIB  = nullptr;
-		ID3D11InputLayout           *m_pInputLayout  = nullptr;
-		ID3D11ShaderResourceView    *m_pDiffuseTexSRV;
+		ID3DX11EffectMatrixVariable *m_pFxWorld           = nullptr;
+		ID3DX11EffectMatrixVariable *m_pFxView            = nullptr;
+		ID3DX11EffectMatrixVariable *m_pFxProj            = nullptr;
+		ID3DX11EffectShaderResourceVariable * m_pFxDiffuseMap = nullptr;
+
+		ID3D11Buffer                *m_pCubeVB        = nullptr;
+		ID3D11Buffer                *m_pCubeIB        = nullptr;
+		ID3D11InputLayout           *m_pInputLayout   = nullptr;
+		ID3D11ShaderResourceView    *m_pDiffuseTexSRV = nullptr;
 		int m_VertexCount = 0;
 		int m_IndexCount  = 0;
 	};

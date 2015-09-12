@@ -99,7 +99,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="model.fx">
+    <FxCompile Include="texture.fx">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

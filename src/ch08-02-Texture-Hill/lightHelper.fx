@@ -1,12 +1,11 @@
- 
- ////////////////////////////Light Buffer/////////////////////////////////
- struct DirectionLight
+
+struct DirectionLight
 {
 	float4 Ambient;
 	float4 Diffuse;
 	float4 Specular;
 	float3 Direction;
-	float  pad;
+	float pad;
 };
 
 struct PointLight
@@ -16,10 +15,10 @@ struct PointLight
 	float4 Specular;
 
 	float3 Position;
-	float  Range;
+	float Range;
 
 	float3 Att;
-	float  pad;
+	float pad;
 };
 
 struct SpotLight
@@ -38,15 +37,6 @@ struct SpotLight
 	float pad;
 };
 
-cbuffer LightBuffer : register(b0)
-{
-	DirectionLight g_DirLight;
-	PointLight     g_PointLight;
-	SpotLight      g_SpotLight;
-	float3         g_EyePos;
-	float          pad;
-};
- ////////////////////////////Material Buffer/////////////////////////////////
 struct Material
 {
 	float4 Ambient;
@@ -55,85 +45,16 @@ struct Material
 	float4 Reflect;
 };
 
-cbuffer MaterialBuffer	: register(b1)
-{	
-  Material g_Mat;
-};
-
-Texture2D g_Tex  : register(t0);
-
-SamplerState samAnisotropic
-{
-	Filter = ANISOTROPIC;
-	MaxAnisotropy = 4;
-
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
-
-//////////////////////////////////////////////////////////////////// 
-struct VS_OUT
-{
-    float4 Pos      : SV_POSITION;
-    float3 Normal   : NORMAL;
-	float2 Tex      : TEXCOORD;
-	float3 WorldPos : POSITION;
-};
-//////////////////////Function/////////////////////////////////////
-
- void CalcDirectionLight(Material mat, DirectionLight L, float3 normal, float3 toEye,
-					     out float4 ambient, out float4 diffuse, out float4 spec);
-
-  void CalcPointLight(Material mat, PointLight L, float3 pos, float3 normal, float3 toEye,
-				         out float4 ambient, out float4 diffuse, out float4 spec);
-
-  void CalcSpotLight(Material mat, SpotLight L, float3 pos, float3 normal, float3 toEye,
-				        out float4 ambient, out float4 diffuse, out float4 spec);
-
-//////////////////////// Main ///////////////////////////////////////
-float4 PS(VS_OUT ps_in) : SV_TARGET
-{
-    ps_in.Normal = normalize(ps_in.Normal);
-    float3 eyeDir = normalize(g_EyePos - ps_in.WorldPos);
-  
-	float4 ambient  = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 diffuse  = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	float4 texColor = g_Tex.Sample(samAnisotropic, ps_in.Tex);
-
-	// Sum the light contribution from each light source.
-	float4 A, D, S;
-	CalcDirectionLight(g_Mat, g_DirLight, ps_in.Normal, eyeDir, A, D, S);
-	ambient   += A;  
-	diffuse   += D;
-	specular  += S;
-
-	CalcPointLight(g_Mat, g_PointLight, ps_in.WorldPos, ps_in.Normal, eyeDir, A, D, S);
-	ambient   += A;  
-	diffuse   += D;
-	specular  += S;
-
-	CalcSpotLight(g_Mat, g_SpotLight, ps_in.WorldPos, ps_in.Normal, eyeDir, A, D, S);
-	ambient   += A;  
-	diffuse   += D;
-	specular  += S;
-
-	float4 lightColor = texColor * (ambient + diffuse) + specular;
-
-	// Common to take alpha from diffuse material.
-	lightColor.a = g_Mat.Diffuse.a * texColor.a;
-
-	return  lightColor;
-}
-
 //---------------------------------------------------------------------------------------
 // Computes the ambient, diffuse, and specular terms in the lighting equation
 // from a directional light.  We need to output the terms separately because
 // later we will modify the individual terms.
 //---------------------------------------------------------------------------------------
-void CalcDirectionLight(Material mat, DirectionLight L, float3 normal, float3 toEye,
-					    out float4 ambient, out float4 diffuse, out float4 spec)
+void CalcDirectionLight(Material mat, DirectionLight L, 
+                             float3 normal, float3 toEye,
+					         out float4 ambient,
+						     out float4 diffuse,
+						     out float4 spec)
 {
 	// Initialize outputs.
 	ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -169,7 +90,7 @@ void CalcDirectionLight(Material mat, DirectionLight L, float3 normal, float3 to
 // later we will modify the individual terms.
 //---------------------------------------------------------------------------------------
 void CalcPointLight(Material mat, PointLight L, float3 pos, float3 normal, float3 toEye,
-				          out float4 ambient, out float4 diffuse, out float4 spec)
+				   out float4 ambient, out float4 diffuse, out float4 spec)
 {
 	// Initialize outputs.
 	ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -221,7 +142,7 @@ void CalcPointLight(Material mat, PointLight L, float3 pos, float3 normal, float
 // later we will modify the individual terms.
 //---------------------------------------------------------------------------------------
 void CalcSpotLight(Material mat, SpotLight L, float3 pos, float3 normal, float3 toEye,
-				   out float4 ambient, out float4 diffuse, out float4 spec)
+				  out float4 ambient, out float4 diffuse, out float4 spec)
 {
 	// Initialize outputs.
 	ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -270,3 +191,6 @@ void CalcSpotLight(Material mat, SpotLight L, float3 pos, float3 normal, float3 
 	diffuse *= att;
 	spec    *= att;
 }
+
+ 
+ 
