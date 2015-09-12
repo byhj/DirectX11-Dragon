@@ -163,7 +163,7 @@ void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
 		0, pD3D11Device, &m_pEffect);
 
-	m_pEffectTechnique = m_pEffect->GetTechniqueByName("ColorTech");
+	m_pEffectTechnique = m_pEffect->GetTechniqueByName("TextureTech");
 
 
 	m_pWorld = m_pEffect->GetVariableByName("World")->AsMatrix();
