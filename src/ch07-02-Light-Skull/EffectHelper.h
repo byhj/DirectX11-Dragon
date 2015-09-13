@@ -32,6 +32,7 @@ public:
 	void SetPointLight(d3d::PointLight &pointLight);
 	void SetSpotLight(d3d::SpotLight &spotLight);
 	void SetMaterial(d3d::Material &mat);
+	void SetDiffuseMap(ID3D11ShaderResourceView *pDiffuseSRV);
 
 	ID3DX11EffectTechnique* GetEffectTech()
 	{

@@ -120,4 +120,9 @@ void EffectHelper::SetProj(XMFLOAT4X4 Proj)
 
 }
 
+void EffectHelper::SetDiffuseMap(ID3D11ShaderResourceView *pDiffuseSRV)
+{
+
+}
+
 }

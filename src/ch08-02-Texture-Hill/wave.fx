@@ -17,9 +17,9 @@ cbuffer MatrixBuffer : register(b0)
 struct VS_OUT
 {
     float4 Pos   : SV_POSITION;
+	float3 Normal   : NORMAL;
 	float2 TexCoord :TEXCOORD;
 	float3 WorldPos : POSITION;
-    float3 Normal   : NORMAL;
 };
 
 Texture2D g_DiffuseMap;

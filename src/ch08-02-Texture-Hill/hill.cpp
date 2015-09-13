@@ -91,7 +91,11 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 	Vertex* v = reinterpret_cast<Vertex*>(mappedData.pData);
 	for (UINT i = 0; i < m_Wave.VertexCount(); ++i)
 	{
-		v[i].Pos = m_Wave[i];
+		v[i].Pos = m_Wave[i]; 	
+		v[i].Normal = m_Wave.Normal(i);
+		// Derive tex-coords in [0,1] from position.
+		v[i].TexCoord.x  = 0.5f+m_Wave[i].x/m_Wave.Width();
+		v[i].TexCoord.y  = 0.5f-m_Wave[i].z/m_Wave.Depth();
 	}
 
 	pD3D11DeviceContext->Unmap(m_pWaveVB, 0);
@@ -266,13 +270,13 @@ void Hill::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11De
 	m_SpotLight.Spot     = 96.0f;
 	m_SpotLight.Range    = 10000.0f;
 	
-	m_LandMat.Ambient  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-	m_LandMat.Diffuse  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	m_LandMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_LandMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_LandMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
-	
-	m_WavesMat.Ambient  = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	m_WavesMat.Diffuse  = XMFLOAT4(0.137f, 0.42f, 0.556f, 1.0f);
-	m_WavesMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 96.0f);
+
+	m_WavesMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_WavesMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_WavesMat.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 32.0f);
 }
 
 void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
@@ -338,7 +342,7 @@ void Hill::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 
 void Hill::init_texture(ID3D11Device *pD3D11Device)
 {
-	D3DX11CreateShaderResourceViewFromFile(pD3D11Device, L"../../media/textures/grass.dds", 0, 0, &m_pGrassSRV, 0);
+	D3DX11CreateShaderResourceViewFromFile(pD3D11Device, L"../../media/textures/grass1.dds", 0, 0, &m_pGrassSRV, 0);
 
 	D3DX11CreateShaderResourceViewFromFile(pD3D11Device, L"../../media/textures/water2.dds", 0, 0, &m_pWaveSRV, 0);
 }
