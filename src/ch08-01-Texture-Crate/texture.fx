@@ -37,7 +37,7 @@ VS_OUT VS(VS_IN vs_in)
 {
   VS_OUT vs_out;
 
-  vs_out.Pos = mul( (float4)(vs_in.Pos, 1.0f), g_World);
+  vs_out.Pos = mul(float4(vs_in.Pos, 1.0f), g_World);
   vs_out.Pos = mul(vs_out.Pos, g_View);
   vs_out.Pos = mul(vs_out.Pos, g_Proj);
 
@@ -52,7 +52,7 @@ float4 PS(VS_OUT vs_out) : SV_TARGET
    vs_out.Normal = normalize(vs_out.Normal);
    float4 textureColor = g_DiffuseMap.Sample(samAnisotropic, vs_out.TexCoord);
 
-   return float4(1.0f, 1.0f, 1.0f, 1.0f); //textureColor;
+   return textureColor;
 }
    
 technique11 TextureTech

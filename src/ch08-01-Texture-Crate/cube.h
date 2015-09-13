@@ -37,12 +37,12 @@ namespace byhj
 			XMFLOAT2 Tex;
 		};
 
-		ID3DX11Effect               *m_pEffect          = nullptr;
-		ID3DX11EffectTechnique      *m_pEffectTechnique = nullptr;
-		ID3DX11EffectMatrixVariable *m_pFxWorld           = nullptr;
-		ID3DX11EffectMatrixVariable *m_pFxView            = nullptr;
-		ID3DX11EffectMatrixVariable *m_pFxProj            = nullptr;
-		ID3DX11EffectShaderResourceVariable * m_pFxDiffuseMap = nullptr;
+		ID3DX11Effect                       *m_pEffect           = nullptr;
+		ID3DX11EffectTechnique              *m_pEffectTechnique  = nullptr;
+		ID3DX11EffectMatrixVariable         *m_pFxWorld          = nullptr;
+		ID3DX11EffectMatrixVariable         *m_pFxView           = nullptr;
+		ID3DX11EffectMatrixVariable         *m_pFxProj           = nullptr;
+		ID3DX11EffectShaderResourceVariable * m_pFxDiffuseMap    = nullptr;
 
 		ID3D11Buffer                *m_pCubeVB        = nullptr;
 		ID3D11Buffer                *m_pCubeIB        = nullptr;

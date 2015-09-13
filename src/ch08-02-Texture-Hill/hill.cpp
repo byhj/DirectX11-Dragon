@@ -122,20 +122,20 @@ void Hill::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBuf
 	{
 
 		m_pFxMaterial->SetRawValue(&m_LandMat, 0, sizeof( m_LandMat ));
+		m_pFxDiffuseMap->SetResource(m_pGrassSRV);
 
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pLandVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pLandIB, DXGI_FORMAT_R32_UINT, 0);
-		m_pFxDiffuseMap->SetResource(m_pGrassSRV);
 		m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 		m_pFxMaterial->SetRawValue(&m_WavesMat, 0, sizeof( m_WavesMat ));
+		m_pFxDiffuseMap->SetResource(m_pWaveSRV);
 
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pWaveVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pWaveIB, DXGI_FORMAT_R32_UINT, 0);
-		m_pFxDiffuseMap->SetResource(m_pWaveSRV);
 		m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(3 * m_Wave.TriangleCount(), 0, 0);
 	}

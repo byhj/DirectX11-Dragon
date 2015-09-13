@@ -33,15 +33,16 @@ namespace byhj
 		cbMatrix.model = matrix.model;
 		cbMatrix.view = matrix.view;
 		cbMatrix.proj = matrix.proj;
-		m_pFxDiffuseMap->SetResource(m_pDiffuseTexSRV);
-		m_pFxWorld->SetMatrix(reinterpret_cast< float* >( &cbMatrix.model ));
-		m_pFxView->SetMatrix(reinterpret_cast< float* >(  &cbMatrix.view ));
-		m_pFxProj->SetMatrix(reinterpret_cast< float* >(  &cbMatrix.proj ));
+
 
 		D3DX11_TECHNIQUE_DESC techDesc;
 		m_pEffectTechnique->GetDesc(&techDesc);
 		for ( UINT p = 0; p<techDesc.Passes; ++p )
 		{
+			m_pFxDiffuseMap->SetResource(m_pDiffuseTexSRV);
+			m_pFxWorld->SetMatrix(reinterpret_cast< float* >( &cbMatrix.model ));
+			m_pFxView->SetMatrix(reinterpret_cast< float* >( &cbMatrix.view ));
+			m_pFxProj->SetMatrix(reinterpret_cast< float* >( &cbMatrix.proj ));
 			m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 			pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 		}
@@ -162,7 +163,7 @@ void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
