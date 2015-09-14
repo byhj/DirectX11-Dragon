@@ -74,6 +74,7 @@
     <ClInclude Include="..\..\include\d3d\Utility.h" />
     <ClInclude Include="..\..\include\d3d\Wave.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="EffectHelper.h" />
     <ClInclude Include="RenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +93,13 @@
     <ClCompile Include="..\..\include\d3d\Wave.cpp" />
     <ClCompile Include="ch08-01-Texture-Crate.cpp" />
     <ClCompile Include="cube.cpp" />
+    <ClCompile Include="EffectHelper.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="lightHelper.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="texture.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>

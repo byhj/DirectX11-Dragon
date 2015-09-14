@@ -15,6 +15,8 @@ namespace byhj
 		init_buffer(pD3D11Device, pD3D11DeviceContext);
 		init_shader(pD3D11Device, hWnd);
 		init_texture(pD3D11Device);
+		init_light();
+		m_EffectHelper.Init(pD3D11Device);
 	}
 
 	void Cube::Render(ID3D11DeviceContext *pD3D11DeviceContext, d3d::MatrixBuffer matrix)
@@ -27,8 +29,8 @@ namespace byhj
 		offset = 0;
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pCubeVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pCubeIB, DXGI_FORMAT_R32_UINT, 0);
-		pD3D11DeviceContext->IASetInputLayout(m_pInputLayout);
 		pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_EffectHelper.Render(pD3D11DeviceContext);
 
 		cbMatrix.model = matrix.model;
 		cbMatrix.view = matrix.view;
@@ -36,14 +38,18 @@ namespace byhj
 
 
 		D3DX11_TECHNIQUE_DESC techDesc;
-		m_pEffectTechnique->GetDesc(&techDesc);
+		ID3DX11EffectTechnique* activeTech = m_EffectHelper.m_pEffectLight2TexTech;
+		activeTech->GetDesc(&techDesc);
+
 		for ( UINT p = 0; p<techDesc.Passes; ++p )
 		{
-			m_pFxDiffuseMap->SetResource(m_pDiffuseTexSRV);
-			m_pFxWorld->SetMatrix(reinterpret_cast< float* >( &cbMatrix.model ));
-			m_pFxView->SetMatrix(reinterpret_cast< float* >( &cbMatrix.view ));
-			m_pFxProj->SetMatrix(reinterpret_cast< float* >( &cbMatrix.proj ));
-			m_pEffectTechnique->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
+			m_EffectHelper.SetDiffuseMap(m_pDiffuseTexSRV);
+			m_EffectHelper.SetWorld(cbMatrix.model);
+			m_EffectHelper.SetView(cbMatrix.view);
+			m_EffectHelper.SetProj(cbMatrix.proj);
+			m_EffectHelper.SetDirLight(m_DirLights);
+			m_EffectHelper.SetMaterial(m_BoxMat);
+			activeTech->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 			pD3D11DeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 		}
 
@@ -51,14 +57,26 @@ namespace byhj
 
 	void Cube::Shutdown()
 	{
+		m_EffectHelper.Shutdown();
 		ReleaseCOM(m_pCubeVB)
 		ReleaseCOM(m_pCubeIB)
-		ReleaseCOM(m_pInputLayout)
 	}
 
 	void Cube::init_light()
 	{
+		m_DirLights[0].Ambient  = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+		m_DirLights[0].Diffuse  = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+		m_DirLights[0].Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+		m_DirLights[0].Direction = XMFLOAT3(0.707f, -0.707f, 0.0f);
 
+		m_DirLights[1].Ambient  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+		m_DirLights[1].Diffuse  = XMFLOAT4(1.4f, 1.4f, 1.4f, 1.0f);
+		m_DirLights[1].Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 16.0f);
+		m_DirLights[1].Direction = XMFLOAT3(-0.707f, 0.0f, 0.707f);
+
+		m_BoxMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+		m_BoxMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		m_BoxMat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
 	}
 
 
@@ -122,55 +140,7 @@ void Cube::init_texture(ID3D11Device *pD3D11Device)
 
 void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 {
-	DWORD shaderFlags = 0;
-#if defined( DEBUG ) || defined( _DEBUG )
-	shaderFlags |= D3D10_SHADER_DEBUG;
-	shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif
 
-	ID3D10Blob* compiledShader = 0;
-	ID3D10Blob* compilationMsgs = 0;
-	HRESULT hr = D3DX11CompileFromFile(L"texture.fx", 0, 0, 0, "fx_5_0", shaderFlags,
-		0, 0, &compiledShader, &compilationMsgs, 0);
-
-	// compilationMsgs can store errors or warnings.
-	if ( compilationMsgs!=0 )
-	{
-		MessageBoxA(0, ( char* )compilationMsgs->GetBufferPointer(), 0, 0);
-		ReleaseCOM(compilationMsgs);
-	}
-
-	// Even if there are no compilationMsgs, check to make sure there were no other errors.
-	if ( FAILED(hr) )
-	{
-		DXTrace(__FILE__, ( DWORD )__LINE__, hr, L"D3DX11CompileFromFile", true);
-	}
-
-	D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
-		0, pD3D11Device, &m_pEffect);
-
-	m_pEffectTechnique = m_pEffect->GetTechniqueByName("TextureTech");
-
-
-	m_pFxWorld = m_pEffect->GetVariableByName("g_World")->AsMatrix();
-	m_pFxView  = m_pEffect->GetVariableByName("g_View")->AsMatrix();
-	m_pFxProj  = m_pEffect->GetVariableByName("g_Proj")->AsMatrix();
-	m_pFxDiffuseMap = m_pEffect->GetVariableByName("g_DiffuseMap")->AsShaderResource();
-
-	// Done with compiled shader.
-	ReleaseCOM(compiledShader);
-
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
-
-	D3DX11_PASS_DESC passDesc;
-	m_pEffectTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
-	pD3D11Device->CreateInputLayout(vertexDesc, 3, passDesc.pIAInputSignature,
-		                            passDesc.IAInputSignatureSize, &m_pInputLayout);
 
 }
 

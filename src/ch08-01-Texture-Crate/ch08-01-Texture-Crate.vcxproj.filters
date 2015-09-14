@@ -62,6 +62,9 @@
     <ClCompile Include="..\..\include\d3d\Wave.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+    <ClCompile Include="EffectHelper.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RenderSystem.h">
@@ -97,9 +100,15 @@
     <ClInclude Include="..\..\include\d3d\Wave.h">
       <Filter>Framework</Filter>
     </ClInclude>
+    <ClInclude Include="EffectHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="texture.fx">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="lightHelper.fx">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

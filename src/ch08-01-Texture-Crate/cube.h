@@ -8,6 +8,7 @@
 #include "d3d/d3dDebug.h"
 #include "d3d/Utility.h"
 #include "d3d/Light.h"
+#include "EffectHelper.h"
 
 namespace byhj
 {
@@ -36,18 +37,20 @@ namespace byhj
 			XMFLOAT3 Normal;
 			XMFLOAT2 Tex;
 		};
-
-		ID3DX11Effect                       *m_pEffect           = nullptr;
-		ID3DX11EffectTechnique              *m_pEffectTechnique  = nullptr;
-		ID3DX11EffectMatrixVariable         *m_pFxWorld          = nullptr;
-		ID3DX11EffectMatrixVariable         *m_pFxView           = nullptr;
-		ID3DX11EffectMatrixVariable         *m_pFxProj           = nullptr;
-		ID3DX11EffectShaderResourceVariable * m_pFxDiffuseMap    = nullptr;
+		EffectHelper m_EffectHelper;
+		struct LightBuffer
+		{
+			d3d::DirectionLight g_DirLights[2];
+			XMFLOAT4       g_EyePos;
+		};
+		LightBuffer cbLight;
+		d3d::DirectionLight m_DirLights[2];
+		d3d::Material m_BoxMat;
 
 		ID3D11Buffer                *m_pCubeVB        = nullptr;
 		ID3D11Buffer                *m_pCubeIB        = nullptr;
-		ID3D11InputLayout           *m_pInputLayout   = nullptr;
 		ID3D11ShaderResourceView    *m_pDiffuseTexSRV = nullptr;
+
 		int m_VertexCount = 0;
 		int m_IndexCount  = 0;
 	};
