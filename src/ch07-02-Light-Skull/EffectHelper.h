@@ -28,7 +28,7 @@ public:
 	void SetProj( XMFLOAT4X4 Proj);
 
 	void SetEyePos(XMFLOAT4 &eyePos);
-	void SetDirLight(d3d::DirectionLight &dirLight);
+	void SetDirLight(d3d::DirectionLight *dirLights);
 	void SetPointLight(d3d::PointLight &pointLight);
 	void SetSpotLight(d3d::SpotLight &spotLight);
 	void SetMaterial(d3d::Material &mat);
@@ -39,7 +39,6 @@ public:
 		return m_pEffectTech1;
 	}
 
-private:
 	ID3DX11Effect          *m_pEffect        = nullptr;
 	ID3DX11EffectTechnique *m_pEffectTech1   = nullptr;
 	ID3DX11EffectTechnique *m_pEffectTech2   = nullptr;

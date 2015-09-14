@@ -42,7 +42,7 @@ private:
 
 	struct LightBuffer
 	{
-		d3d::DirectionLight g_DirLight;
+		d3d::DirectionLight g_DirLights[3];
 		XMFLOAT4       g_EyePos;
 	};
 	LightBuffer cbLight;

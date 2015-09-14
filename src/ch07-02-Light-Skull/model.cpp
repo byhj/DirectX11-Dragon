@@ -43,15 +43,26 @@ void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBu
 	m_EffectHelper.SetView(cbMatrix.view);
 	m_EffectHelper.SetProj(cbMatrix.proj);
 
-	cbLight.g_DirLight   = m_DirLights[mLightCount];
-	cbLight.g_EyePos     = camera->GetCamPos();
-	m_EffectHelper.SetDirLight(cbLight.g_DirLight);
+	cbLight.g_EyePos  = camera->GetCamPos();
+	m_EffectHelper.SetDirLight(m_DirLights);
 	m_EffectHelper.SetEyePos(cbLight.g_EyePos);
 
-
 	D3DX11_TECHNIQUE_DESC techDesc;
-	ID3DX11EffectTechnique* activeTech = m_EffectHelper.GetEffectTech();
+	ID3DX11EffectTechnique* activeTech = m_EffectHelper.m_pEffectTech1 ;
+	switch ( mLightCount )
+	{
+	case 1:
+		activeTech = m_EffectHelper.m_pEffectTech1;
+		break;
+	case 2:
+		activeTech = m_EffectHelper.m_pEffectTech2;
+		break;
+	case 3:
+		activeTech = m_EffectHelper.m_pEffectTech3;
+		break;
+	}
 	activeTech->GetDesc(&techDesc);
+
 	for ( UINT p = 0; p<techDesc.Passes; ++p )
 	{
 		// Set vertex buffer stride and offset
@@ -60,7 +71,6 @@ void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBu
 		stride = sizeof( Vertex );
 		offset = 0;
 
-		
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, &m_pShapesVB, &stride, &offset);
 		pD3D11DeviceContext->IASetIndexBuffer(m_pShapesIB, DXGI_FORMAT_R32_UINT, 0);
 
@@ -79,7 +89,6 @@ void Model::Render(ID3D11DeviceContext *pD3D11DeviceContext, const d3d::MatrixBu
 		m_EffectHelper.SetMaterial(m_BoxMat);
 		activeTech->GetPassByIndex(p)->Apply(0, pD3D11DeviceContext);
 		pD3D11DeviceContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
-
 
 		// Draw the cylinders.
 		m_EffectHelper.SetMaterial(m_CylinderMat);

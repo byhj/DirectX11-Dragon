@@ -42,14 +42,16 @@ void EffectHelper::Init(ID3D11Device *pD3D11Device)
 	D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
 		0, pD3D11Device, &m_pEffect);
 
-	m_pEffectTech1  = m_pEffect->GetTechniqueByName("LightTech");
+	m_pEffectTech1  = m_pEffect->GetTechniqueByName("LightTech1");
+	m_pEffectTech2  = m_pEffect->GetTechniqueByName("LightTech2");
+	m_pEffectTech3  = m_pEffect->GetTechniqueByName("LightTech3");
 
 
 	m_pFxWorld      = m_pEffect->GetVariableByName("g_World")->AsMatrix();
 	m_pFxView       = m_pEffect->GetVariableByName("g_View")->AsMatrix();
 	m_pFxProj       = m_pEffect->GetVariableByName("g_Proj")->AsMatrix();
 	m_pFxEyePos     = m_pEffect->GetVariableByName("g_EyePos")->AsVector();
-	m_pFxDirLight   = m_pEffect->GetVariableByName("g_DirLight");
+	m_pFxDirLight   = m_pEffect->GetVariableByName("g_DirLights");
 	m_pFxMaterial   = m_pEffect->GetVariableByName("g_Mat");
 
 	// Done with compiled shader.
@@ -83,9 +85,9 @@ void EffectHelper::SetEyePos( XMFLOAT4 &eyePos)
 	m_pFxEyePos->SetRawValue(&eyePos, 0, sizeof( XMFLOAT4 ));
 }
 
-void EffectHelper::SetDirLight( d3d::DirectionLight &dirLight)
+void EffectHelper::SetDirLight( d3d::DirectionLight *dirLights)
 {
-	m_pFxDirLight->SetRawValue(&dirLight, 0, sizeof( dirLight ));
+	m_pFxDirLight->SetRawValue(dirLights, 0, 3 * sizeof( dirLights[0] ));
 }
 
 void EffectHelper::SetMaterial( d3d::Material &mat)
