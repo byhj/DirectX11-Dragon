@@ -2,11 +2,13 @@
 #define CUBE_H
 
 #include <d3d11.h>
-#include <xnamath.h>
 
+#include <DirectXMath.h>
 #include "d3dx11effect.h"
 #include "d3d/d3dDebug.h"
 #include "d3d/Utility.h"
+
+using namespace DirectX;
 
 namespace byhj
 {

@@ -51,6 +51,9 @@
     <ClInclude Include="..\..\include\d3d\Wave.h">
       <Filter>Framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\DirectXTK\DDSTextureLoader.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ch08-02-Texture-Hill.cpp">
@@ -87,6 +90,9 @@
       <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\d3d\Wave.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\DirectXTK\DDSTextureLoader.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
   </ItemGroup>

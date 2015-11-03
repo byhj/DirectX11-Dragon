@@ -2,7 +2,9 @@
 #define Wave_H
 
 #include <Windows.h>
-#include <xnamath.h>
+
+#include <DirectXMath.h> 
+using namespace DirectX;
 
 namespace byhj
 {

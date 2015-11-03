@@ -268,7 +268,7 @@ void Model::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11D
 	D3D11_SUBRESOURCE_DATA shapeVBO;
 	shapeVBO.pSysMem = &vertices[0];
 	hr = pD3D11Device->CreateBuffer(&shapesVBDesc, &shapeVBO, &m_pShapesVB);
-	DebugHR(hr);
+	//DebugHR(hr);
 
 	std::vector<UINT> IndexData;
 	IndexData.insert(IndexData.end(), box.IndexData.begin(), box.IndexData.end());
@@ -288,7 +288,7 @@ void Model::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11D
 	D3D11_SUBRESOURCE_DATA shapeIBO;
 	shapeIBO.pSysMem = &IndexData[0];
 	hr = pD3D11Device->CreateBuffer(&shapeIBDesc, &shapeIBO, &m_pShapesIB);
-	DebugHR(hr);
+	//DebugHR(hr);
 
 	////////////////////////////////////Skull/////////////////////////////////////////
 
@@ -329,7 +329,7 @@ void Model::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11D
 	D3D11_SUBRESOURCE_DATA skullVBO;
 	skullVBO.pSysMem = &m_VertexData[0];
 	hr = pD3D11Device->CreateBuffer(&skullVBDesc, &skullVBO, &m_pSkullVB);
-	DebugHR(hr);
+	//DebugHR(hr);
 
 	/////////////////////////////Index Buffer//////////////////////////////
 
@@ -350,7 +350,7 @@ void Model::init_buffer(ID3D11Device *pD3D11Device, ID3D11DeviceContext *pD3D11D
 	D3D11_SUBRESOURCE_DATA skullIBO;
 	skullIBO.pSysMem = &m_IndexData[0];
 	hr = pD3D11Device->CreateBuffer(&skullIBDesc, &skullIBO, &m_pSkullIB);
-	DebugHR(hr);
+	//DebugHR(hr);
 	////////////////////////////////Const Buffer//////////////////////////////////////
 
 

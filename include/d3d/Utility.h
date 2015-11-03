@@ -2,9 +2,12 @@
 #define UTILITY_H
 
 #include <windows.h>
-#include <xnamath.h>
-#include <dxerr.h>
 
+
+#include <dxerr.h>
+#include <DirectXMath.h>
+
+using namespace DirectX;
 namespace byhj
 {
 

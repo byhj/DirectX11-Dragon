@@ -2,7 +2,9 @@
 #define LIGHT_H
 
 #include <d3d11.h>
-#include <xnamath.h>
+
+#include <DirectXMath.h> 
+using namespace DirectX;
 
 
 namespace byhj

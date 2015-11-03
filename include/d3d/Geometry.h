@@ -5,7 +5,9 @@
 #include <vector>
 #include <algorithm>
 
-#include <xnamath.h>
+#include <DirectXMath.h>
+
+using namespace DirectX;
 
 namespace byhj
 {

@@ -27,7 +27,7 @@
     <ClCompile Include="RenderSystem.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\d3d\d3dApp.cpp">
+    <ClCompile Include="..\..\include\d3d\App.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,7 +38,7 @@
     <ClInclude Include="window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\d3d\d3dApp.h">
+    <ClInclude Include="..\..\include\d3d\App.h">
       <Filter>Framework</Filter>
     </ClInclude>
   </ItemGroup>

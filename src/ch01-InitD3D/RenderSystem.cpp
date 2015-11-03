@@ -76,14 +76,14 @@ void RenderSystem::InitDevice()
 		NULL, NULL, NULL, NULL, D3D11_SDK_VERSION,
 		&swapChainDesc, &m_pSwapChain, &m_pD3D11Device,
 		NULL, &m_pD3D11DeviceContext);
-	DebugHR(hr);
+	//DebugHR(hr);
 
 	//Create back buffer, buffer also is a texture
 	ID3D11Texture2D *pBackBuffer;
 	hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
 	hr = m_pD3D11Device->CreateRenderTargetView(pBackBuffer, NULL, &m_pRenderTargetView);
 	pBackBuffer->Release();
-	DebugHR(hr);
+	//DebugHR(hr);
 
 }
 

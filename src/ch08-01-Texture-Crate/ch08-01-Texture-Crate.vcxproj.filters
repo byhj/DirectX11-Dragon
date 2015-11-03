@@ -65,6 +65,9 @@
     <ClCompile Include="EffectHelper.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\include\DirectXTK\DDSTextureLoader.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RenderSystem.h">
@@ -102,6 +105,9 @@
     </ClInclude>
     <ClInclude Include="EffectHelper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\DirectXTK\DDSTextureLoader.h">
+      <Filter>Framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,8 @@
 #ifndef EFFECTHELPER_H
 #define EFFECTHELPER_H
 
-#include <d3dx11.h>
-#include <xnamath.h>
+
+#include <DirectXMath.h> using namespace DirectX;
 #include "d3dx11effect.h"
 #include "d3d/Light.h"
 #include "d3d/Utility.h"

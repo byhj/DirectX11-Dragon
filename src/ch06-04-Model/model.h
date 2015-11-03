@@ -2,7 +2,7 @@
 #define CUBE_H
 
 #include <d3d11.h>
-#include <xnamath.h>
+#include <DirectXMath.h> using namespace DirectX;
 #include <vector>
 
 #include "d3dx11effect.h"

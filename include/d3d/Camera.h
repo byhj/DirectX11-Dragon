@@ -2,10 +2,13 @@
 #define D3DCAMERA_H
 
 #include <windows.h>
-#include <d3dx11.h>
 #include <dinput.h>
 #include <d3d11.h>
-#include <xnamath.h>
+
+
+#include <DirectXMath.h>
+
+using namespace DirectX;
 
 namespace byhj
 {

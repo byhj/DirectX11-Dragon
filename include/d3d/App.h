@@ -11,12 +11,9 @@
 
 #include <WindowsX.h>
 #include <windows.h>
-#include <d3dx11.h>
 #include <dxgi.h>
 #include <d3d11.h>
-#include <xnamath.h>
 #include <d3dcommon.h>
-#include <D3DX11async.h>
 
 #include <ctime>
 #include <algorithm>

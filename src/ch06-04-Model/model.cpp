@@ -2,8 +2,10 @@
 #include <iostream>
 #include <string>
 
+#include <d3dcompiler.h>
+
 #include "model.h"
-#include <D3DX11.h>
+
 
 namespace byhj
 {
@@ -101,7 +103,7 @@ namespace byhj
 		D3D11_SUBRESOURCE_DATA VBO;
 		VBO.pSysMem = &m_VertexData[0];
 		hr = pD3D11Device->CreateBuffer(&vertexBufferDesc, &VBO, &m_pVertexBuffer);
-		DebugHR(hr);
+		//DebugHR(hr);
 
 
 		/////////////////////////////Index Buffer//////////////////////////////
@@ -117,39 +119,41 @@ namespace byhj
 		D3D11_SUBRESOURCE_DATA IBO;
 		IBO.pSysMem = &m_IndexData[0];
 		hr = pD3D11Device->CreateBuffer(&indexBufferDesc, &IBO, &m_pIndexBuffer);
-		DebugHR(hr);
+		//DebugHR(hr);
 
 
 	}
 
 	void Model::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
 	{
-		DWORD shaderFlags = 0;
-#if defined( DEBUG ) || defined( _DEBUG )
-		shaderFlags |= D3D10_SHADER_DEBUG;
-		shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
+		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+#ifdef _DEBUG
+		// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
+		// Setting this flag improves the shader debugging experience, but still allows 
+		// the shaders to be optimized and to run exactly the way they will run in 
+		// the release configuration of this program.
+		dwShaderFlags |= D3DCOMPILE_DEBUG;
+
+		// Disable optimizations to further improve shader debugging
+		dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
-		ID3D10Blob* compiledShader = 0;
-		ID3D10Blob* compilationMsgs = 0;
-		HRESULT hr = D3DX11CompileFromFile(L"model.fx", 0, 0, 0, "fx_5_0", shaderFlags,
-			0, 0, &compiledShader, &compilationMsgs, 0);
+#if D3D_COMPILER_VERSION >= 46
 
-		// compilationMsgs can store errors or warnings.
-		if ( compilationMsgs!=0 )
-		{
-			MessageBoxA(0, ( char* )compilationMsgs->GetBufferPointer(), 0, 0);
-			ReleaseCOM(compilationMsgs);
-		}
+		// Read the D3DX effect file
+		HRESULT hr = S_OK;
+		D3DX11CompileEffectFromFile(L"model.fx", nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, dwShaderFlags, 0, pD3D11Device, &m_pEffect, nullptr);
 
-		// Even if there are no compilationMsgs, check to make sure there were no other errors.
-		if ( FAILED(hr) )
-		{
-			DXTrace(__FILE__, ( DWORD )__LINE__, hr, L"D3DX11CompileFromFile", true);
-		}
+#else
 
-		D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
-			0, pD3D11Device, &m_pEffect);
+		ID3DBlob* pEffectBuffer = nullptr;
+		V_RETURN(DXUTCompileFromFile(L"Tutorial11.fx", nullptr, "none", "fx_5_0", dwShaderFlags, 0, &pEffectBuffer));
+		hr = D3DX11CreateEffectFromMemory(pEffectBuffer->GetBufferPointer(), pEffectBuffer->GetBufferSize(), 0, pd3dDevice, &m_pEffect);
+		SAFE_RELEASE(pEffectBuffer);
+		if (FAILED(hr))
+			return hr;
+
+#endif
 
 		m_pEffectTechnique = m_pEffect->GetTechniqueByName("ModelTech");
 
@@ -159,7 +163,7 @@ namespace byhj
 		m_pProj  = m_pEffect->GetVariableByName("g_Proj")->AsMatrix();
 
 		// Done with compiled shader.
-		ReleaseCOM(compiledShader);
+
 
 		D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 		{

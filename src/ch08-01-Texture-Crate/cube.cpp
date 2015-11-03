@@ -1,6 +1,7 @@
 #include "cube.h"
-#include <D3DX11.h>
+
 #include "d3d/Geometry.h"
+#include "DirectXTK/DDSTextureLoader.h"
 
 namespace byhj
 {
@@ -113,7 +114,7 @@ namespace byhj
 		D3D11_SUBRESOURCE_DATA shapeVBO;
 		shapeVBO.pSysMem = &VertexData[0];
 		hr = pD3D11Device->CreateBuffer(&cubeVBDesc, &shapeVBO, &m_pCubeVB);
-		DebugHR(hr);
+		//DebugHR(hr);
 
 
 		D3D11_BUFFER_DESC cubeIBDesc;
@@ -127,15 +128,15 @@ namespace byhj
 		D3D11_SUBRESOURCE_DATA shapeIBO;
 		shapeIBO.pSysMem = &box.IndexData[0];
 		hr = pD3D11Device->CreateBuffer(&cubeIBDesc, &shapeIBO, &m_pCubeIB);
-		DebugHR(hr);
+		//DebugHR(hr);
 
 	}
 
 void Cube::init_texture(ID3D11Device *pD3D11Device)
 {
 	HRESULT hr;
-	hr = D3DX11CreateShaderResourceViewFromFile(pD3D11Device, L"../../media/textures/WoodCrate01.dds", 0, 0, &m_pDiffuseTexSRV, 0 );
-	DebugHR(hr);
+	hr = CreateDDSTextureFromFile(pD3D11Device, L"../../media/textures/WoodCrate01.dds", 0,  &m_pDiffuseTexSRV);
+	//DebugHR(hr);
 }
 
 void Cube::init_shader(ID3D11Device *pD3D11Device, HWND hWnd)
