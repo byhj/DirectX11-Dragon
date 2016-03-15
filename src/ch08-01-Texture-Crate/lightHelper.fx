@@ -193,4 +193,3 @@ void CalcSpotLight(Material mat, SpotLight L, float3 pos, float3 normal, float3 
 }
 
  
- 

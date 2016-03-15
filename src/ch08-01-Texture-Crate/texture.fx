@@ -61,38 +61,23 @@ VS_OUT VS(VS_IN vs_in)
   return vs_out;
 }
 
-float4 PS(VS_OUT vs_out, uniform int g_LightCount, uniform bool g_UseTexture) : SV_TARGET
+float4 PS(VS_OUT vs_out) : SV_TARGET
 {
    vs_out.Normal = normalize(vs_out.Normal);
    float4 texColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-    if(g_UseTexture)
-	{
-		texColor =  g_DiffuseMap.Sample(samAnisotropic, vs_out.TexCoord);
-	}
 
-	// Lighting.
-	float4 lightColor = texColor;
-	if( g_LightCount > 0  )
-	{  
- 
+   texColor =  g_DiffuseMap.Sample(samAnisotropic, vs_out.TexCoord);
+
          float3 eyeDir = normalize( float3(0.0f, 0.0f, 0.0f) - vs_out.WorldPos);
         
 	     float4 ambient  = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	     float4 diffuse  = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	     float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	// Sum the light contribution from each light source.
-	    for (int i = 0; i != g_LightCount; ++i)
-	    {
-	       float4 A, D, S;
-	       CalcDirectionLight(g_Mat, g_DirLights[i], vs_out.Normal, eyeDir, A, D, S);
-	       ambient   += A;  
-	       diffuse   += D;
-	       specular  += S;
-	    }
 
-	    float4 lightColor = texColor * (ambient + diffuse) + specular;
-	}
+
+	    float4 lightColor = texColor;
+
 
 	// Common to take alpha from diffuse material and texture.
 	lightColor.a = g_Mat.Diffuse.a * texColor.a;
@@ -107,7 +92,7 @@ technique11 Light1
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(1, false) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }
 
@@ -117,7 +102,7 @@ technique11 Light2
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(2, false) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }
 
@@ -127,7 +112,7 @@ technique11 Light3
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(3, false) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }
 
@@ -137,7 +122,7 @@ technique11 Light0Tex
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(0, true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }
 
@@ -147,7 +132,7 @@ technique11 Light1Tex
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(1, true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }
 
@@ -157,7 +142,7 @@ technique11 Light2Tex
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(2, true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }
 
@@ -167,6 +152,6 @@ technique11 Light3Tex
     {
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(3, true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }

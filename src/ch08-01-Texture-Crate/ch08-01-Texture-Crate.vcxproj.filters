@@ -24,6 +24,15 @@
     <None Include="model.vsh">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="texture.fx">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lightHelper.fx">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="model.fx">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ch08-01-Texture-Crate.cpp">
@@ -109,13 +118,5 @@
     <ClInclude Include="..\..\include\DirectXTK\DDSTextureLoader.h">
       <Filter>Framework</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="texture.fx">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="lightHelper.fx">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

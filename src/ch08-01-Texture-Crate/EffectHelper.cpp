@@ -31,13 +31,19 @@ namespace byhj
 #if D3D_COMPILER_VERSION >= 46
 
 		// Read the D3DX effect file
-		HRESULT hr = S_OK;
-		D3DX11CompileEffectFromFile(L"texture.fx", nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, dwShaderFlags, 0, pD3D11Device, &m_pEffect, nullptr);
+	
+		ID3DBlob* pErrorBlob = nullptr;
+		 D3DX11CompileEffectFromFile(L"texture.fx", nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, dwShaderFlags, 0, pD3D11Device, &m_pEffect, &pErrorBlob);
 
+		if (pErrorBlob)
+		{
+			OutputDebugStringA(reinterpret_cast<const char*>(pErrorBlob->GetBufferPointer()));
+			pErrorBlob->Release();
+		}
 #else
 
 		ID3DBlob* pEffectBuffer = nullptr;
-		V_RETURN(DXUTCompileFromFile(L"Tutorial11.fx", nullptr, "none", "fx_5_0", dwShaderFlags, 0, &pEffectBuffer));
+		V_RETURN(DXUTCompileFromFile(L"texture.fx", nullptr, "none", "fx_5_0", dwShaderFlags, 0, &pEffectBuffer));
 		hr = D3DX11CreateEffectFromMemory(pEffectBuffer->GetBufferPointer(), pEffectBuffer->GetBufferSize(), 0, pd3dDevice, &m_pEffect);
 		SAFE_RELEASE(pEffectBuffer);
 		if (FAILED(hr))
